@@ -1,8 +1,35 @@
 -- NPC 名字池
 local npcNames = {
-    "战士", "猎手", "守卫", "斗士",
-    "勇士", "卫兵", "先锋", "猛士", 
-    "武者", "护卫", "斥候", "勇者"
+    "约翰逊",
+    "威廉姆斯",
+    "史密斯",
+    "安德森",
+    "布朗",
+    "米勒",
+    "威尔逊",
+    "泰勒",
+    "托马斯",
+    "杰克逊",
+    "怀特",
+    "哈里斯",
+    "马丁",
+    "汤普森",
+    "加西亚",
+    "马丁内斯",
+    "罗宾逊",
+    "克拉克",
+    "罗德里格斯",
+    "路易斯",
+    "李",
+    "沃克",
+    "霍尔",
+    "艾伦",
+    "杨",
+    "埃尔南德斯",
+    "金",
+    "赖特",
+    "洛佩兹",
+    "希尔"
 }
 
 -- 军衔系统和对应颜色
@@ -108,18 +135,25 @@ end
 -- 当 NPC 击杀其他 NPC 时
 if SERVER then -- 只在服务器端处理击杀事件
     hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
-        if not IsValid(attacker) or not attacker:IsNPC() then return end
+        -- 检查双方是否都是有效的NPC
+        if not IsValid(npc) or not IsValid(attacker) then return end
+        if not npc:IsNPC() or not attacker:IsNPC() then return end
         
         local attackerIndex = attacker:EntIndex()
         local npcData = npcs[attackerIndex]
         if not npcData then return end
+        
+        -- 获取被击杀者的数据
+        local victimData = npcs[npc:EntIndex()]
+        local victimName = victimData and victimData.name or "未知敌人"
+        local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
         
         npcData.kills = npcData.kills + 1
         npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
+        local message = string.format("%s %s击败了%s %s！", rank, npcData.name, victimRank, victimName)
         BroadcastMessage(message, rankColor)
         
         SyncNPCData(attacker, npcData)
@@ -128,13 +162,22 @@ if SERVER then -- 只在服务器端处理击杀事件
             local newRank = GetRank(npcData.level)
             BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank), rankColor)
         end
+        
+        -- 延迟清理被击杀NPC的数据
+        timer.Simple(0.1, function()
+            npcs[npc:EntIndex()] = nil
+        end)
     end)
 end
 
 -- 当 NPC 被移除时清理数据
 hook.Add("EntityRemoved", "CleanupNPCData", function(ent)
     if IsValid(ent) and ent:IsNPC() then
-        npcs[ent:EntIndex()] = nil
+        -- 如果这个NPC是被击杀的,数据会在OnNPCKilled中延迟清理
+        -- 这里只处理其他情况下的NPC移除(比如被移除工具移除)
+        if ent:Health() > 0 then
+            npcs[ent:EntIndex()] = nil
+        end
     end
 end)
 
