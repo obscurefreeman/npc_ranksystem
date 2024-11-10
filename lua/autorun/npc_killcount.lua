@@ -5,6 +5,30 @@ local npcNames = {
     "武者", "护卫", "斥候", "勇者"
 }
 
+-- 军衔系统
+local ranks = {
+    [1] = "列兵",
+    [2] = "下士",
+    [3] = "中士",
+    [4] = "上士",
+    [5] = "少尉",
+    [6] = "中尉",
+    [7] = "上尉",
+    [8] = "少校",
+    [9] = "中校",
+    [10] = "上校",
+    [11] = "大校",
+    [12] = "少将",
+    [13] = "中将",
+    [14] = "上将",
+    [15] = "大将"
+}
+
+-- 获取军衔的函数
+local function GetRank(level)
+    return ranks[math.min(level, #ranks)]
+end
+
 -- NPC 数据存储
 local npcs = {}
 
@@ -77,7 +101,8 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     npcData.kills = npcData.kills + 1
     npcData.level = math.floor(npcData.kills / 2) + 1
     
-    local message = string.format("Lv.%d的%s击败了一个敌人！", npcData.level, npcData.name)
+    local rank = GetRank(npcData.level)
+    local message = string.format("%s级%s击败了一个敌人！", rank, npcData.name)
     BroadcastMessage(message)
     
     if SERVER then
@@ -85,7 +110,8 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     end
     
     if npcData.kills % 2 == 0 then
-        BroadcastMessage(string.format("%s升到了%d级！", npcData.name, npcData.level))
+        local newRank = GetRank(npcData.level)
+        BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank))
     end
 end)
 
@@ -107,9 +133,10 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     local npcData = npcs[tr.Entity:EntIndex()]
     if not npcData then return end
     
+    local rank = GetRank(npcData.level)
     local sw, sh = ScrW(), ScrH()
     draw.SimpleText(
-        string.format("Lv.%d %s", npcData.level, npcData.name),
+        string.format("%s %s", rank, npcData.name),
         "DermaLarge",
         sw / 2,
         sh / 1.87,
