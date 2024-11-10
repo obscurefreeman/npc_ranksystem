@@ -5,28 +5,33 @@ local npcNames = {
     "武者", "护卫", "斥候", "勇者"
 }
 
--- 军衔系统
+-- 军衔系统和对应颜色
 local ranks = {
-    [1] = "列兵",
-    [2] = "下士",
-    [3] = "中士",
-    [4] = "上士",
-    [5] = "少尉",
-    [6] = "中尉",
-    [7] = "上尉",
-    [8] = "少校",
-    [9] = "中校",
-    [10] = "上校",
-    [11] = "大校",
-    [12] = "少将",
-    [13] = "中将",
-    [14] = "上将",
-    [15] = "大将"
+    [1] = {name = "列兵", color = Color(255, 255, 255)},  -- 白色
+    [2] = {name = "下士", color = Color(255, 127, 80)},   -- 珊瑚色
+    [3] = {name = "中士", color = Color(255, 165, 0)},    -- 橙色
+    [4] = {name = "上士", color = Color(255, 215, 0)},    -- 金色
+    [5] = {name = "少尉", color = Color(144, 238, 144)},  -- 浅绿色
+    [6] = {name = "中尉", color = Color(0, 255, 127)},    -- 春绿色
+    [7] = {name = "上尉", color = Color(34, 139, 34)},    -- 森林绿
+    [8] = {name = "少校", color = Color(135, 206, 250)},  -- 天蓝色
+    [9] = {name = "中校", color = Color(30, 144, 255)},   -- 道奇蓝
+    [10] = {name = "上校", color = Color(0, 0, 205)},     -- 中蓝色
+    [11] = {name = "大校", color = Color(138, 43, 226)},  -- 紫罗兰色
+    [12] = {name = "少将", color = Color(255, 215, 0)},   -- 金色
+    [13] = {name = "中将", color = Color(255, 69, 0)},    -- 红橙色
+    [14] = {name = "上将", color = Color(220, 20, 60)},   -- 猩红色
+    [15] = {name = "大将", color = Color(139, 0, 0)}      -- 深红色
 }
 
 -- 获取军衔的函数
 local function GetRank(level)
-    return ranks[math.min(level, 15)]
+    return ranks[math.min(level, 15)].name
+end
+
+-- 获取军衔颜色的函数
+local function GetRankColor(level)
+    return ranks[math.min(level, 15)].color
 end
 
 -- NPC 数据存储
@@ -49,7 +54,7 @@ local function SyncNPCData(ent, npcData)
 end
 
 -- 发送聊天消息的函数
-local function BroadcastMessage(message)
+local function BroadcastMessage(message, color)
     for _, ply in ipairs(player.GetAll()) do
         ply:ChatPrint(message)
     end
@@ -134,13 +139,14 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     if not npcData then return end
     
     local rank = GetRank(npcData.level)
+    local rankColor = GetRankColor(npcData.level)
     local sw, sh = ScrW(), ScrH()
     draw.SimpleText(
         string.format("%s %s", rank, npcData.name),
         "DermaLarge",
         sw / 2,
         sh / 1.87,
-        Color(255, 255, 255),
+        rankColor,
         TEXT_ALIGN_CENTER,
         TEXT_ALIGN_CENTER
     )
