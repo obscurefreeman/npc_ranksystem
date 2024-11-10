@@ -16,14 +16,51 @@ hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
     timer.Simple(0, function()
         if not IsValid(ent) then return end
         
-        -- 随机分配名字和初始化等级
-        npcs[ent:EntIndex()] = {
+        -- 为这个NPC创建一个固定的数据
+        local npcData = {
             name = npcNames[math.random(#npcNames)],
             level = 1,
             kills = 0
         }
+        
+        -- 保存数据到全局表
+        npcs[ent:EntIndex()] = npcData
+        
+        -- 在服务器端保存数据
+        if SERVER then
+            -- 向所有客户端同步NPC数据
+            net.Start("SyncNPCData")
+            net.WriteEntity(ent)
+            net.WriteString(npcData.name)
+            net.WriteUInt(npcData.level, 8)
+            net.WriteUInt(npcData.kills, 8)
+            net.Broadcast()
+        end
     end)
 end)
+
+-- 在文件开头添加网络字符串
+if SERVER then
+    util.AddNetworkString("SyncNPCData")
+end
+
+-- 在客户端接收数据
+if CLIENT then
+    net.Receive("SyncNPCData", function()
+        local ent = net.ReadEntity()
+        local name = net.ReadString()
+        local level = net.ReadUInt(8)
+        local kills = net.ReadUInt(8)
+        
+        if IsValid(ent) then
+            npcs[ent:EntIndex()] = {
+                name = name,
+                level = level,
+                kills = kills
+            }
+        end
+    end)
+end
 
 -- 当 NPC 击杀其他 NPC 时
 hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
