@@ -76,6 +76,16 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
         local attackerLevel = npcs[attackerIndex].level
         local message = string.format("Lv.%d的%s击败了一个敌人！", attackerLevel, attackerName)
         
+        -- 在服务器端同步更新后的数据
+        if SERVER then
+            net.Start("SyncNPCData")
+            net.WriteEntity(attacker)
+            net.WriteString(npcs[attackerIndex].name)
+            net.WriteUInt(npcs[attackerIndex].level, 8)
+            net.WriteUInt(npcs[attackerIndex].kills, 8)
+            net.Broadcast()
+        end
+        
         -- 发送消息到所有玩家的聊天栏
         for _, ply in ipairs(player.GetAll()) do
             ply:ChatPrint(message)
