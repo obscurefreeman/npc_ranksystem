@@ -106,31 +106,31 @@ if CLIENT then
 end
 
 -- 当 NPC 击杀其他 NPC 时
-hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
-    if not IsValid(attacker) or not attacker:IsNPC() then return end
-    
-    local attackerIndex = attacker:EntIndex()
-    local npcData = npcs[attackerIndex]
-    if not npcData then return end
-    
-    npcData.kills = npcData.kills + 1
-    npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
-    
-    local rank = GetRank(npcData.level)
-    local rankColor = GetRankColor(npcData.level)
-    local message
-    if npcData.kills % 2 == 0 and npcData.level < 15 then
-        local newRank = GetRank(npcData.level)
-        message = string.format("%s %s击败了一个敌人并晋升为%s！", rank, npcData.name, newRank)
-    else
-        message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
-    end
-    BroadcastMessage(message, rankColor)
-    
-    if SERVER then
+if SERVER then -- 只在服务器端处理击杀事件
+    hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
+        if not IsValid(attacker) or not attacker:IsNPC() then return end
+        
+        local attackerIndex = attacker:EntIndex()
+        local npcData = npcs[attackerIndex]
+        if not npcData then return end
+        
+        npcData.kills = npcData.kills + 1
+        npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
+        
+        local rank = GetRank(npcData.level)
+        local rankColor = GetRankColor(npcData.level)
+        local message
+        if npcData.kills % 2 == 0 and npcData.level < 15 then
+            local newRank = GetRank(npcData.level)
+            message = string.format("%s %s击败了一个敌人并晋升为%s！", rank, npcData.name, newRank)
+        else
+            message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
+        end
+        BroadcastMessage(message, rankColor)
+        
         SyncNPCData(attacker, npcData)
-    end
-end)
+    end)
+end
 
 -- 当 NPC 被移除时清理数据
 hook.Add("EntityRemoved", "CleanupNPCData", function(ent)
