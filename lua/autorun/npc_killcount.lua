@@ -33,6 +33,24 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     if npcs[attackerIndex] then
         npcs[attackerIndex].kills = npcs[attackerIndex].kills + 1
         npcs[attackerIndex].level = math.floor(npcs[attackerIndex].kills / 2) + 1
+        
+        -- 添加击杀消息
+        local attackerName = npcs[attackerIndex].name
+        local attackerLevel = npcs[attackerIndex].level
+        local message = string.format("Lv.%d的%s击败了一个敌人！", attackerLevel, attackerName)
+        
+        -- 发送消息到所有玩家的聊天栏
+        for _, ply in ipairs(player.GetAll()) do
+            ply:ChatPrint(message)
+        end
+        
+        -- 如果刚好升级，发送升级消息
+        if npcs[attackerIndex].kills % 2 == 0 then
+            local levelUpMsg = string.format("%s升到了%d级！", attackerName, attackerLevel)
+            for _, ply in ipairs(player.GetAll()) do
+                ply:ChatPrint(levelUpMsg)
+            end
+        end
     end
 end)
 
