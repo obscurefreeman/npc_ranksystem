@@ -40,6 +40,7 @@ local npcs = {}
 -- 网络通信相关
 if SERVER then
     util.AddNetworkString("SyncNPCData")
+    util.AddNetworkString("BroadcastMessage")
 end
 
 -- 同步 NPC 数据到客户端的函数
@@ -55,8 +56,11 @@ end
 
 -- 发送聊天消息的函数
 local function BroadcastMessage(message, color)
-    for _, ply in ipairs(player.GetAll()) do
-        ply:ChatPrint(message)
+    if SERVER then
+        net.Start("BroadcastMessage")
+        net.WriteString(message)
+        net.WriteTable(color or Color(255, 255, 255))
+        net.Broadcast()
     end
 end
 
@@ -93,6 +97,12 @@ if CLIENT then
             kills = net.ReadUInt(8)
         }
     end)
+
+    net.Receive("BroadcastMessage", function()
+        local message = net.ReadString()
+        local color = net.ReadTable()
+        chat.AddText(color, message)
+    end)
 end
 
 -- 当 NPC 击杀其他 NPC 时
@@ -107,8 +117,9 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
     
     local rank = GetRank(npcData.level)
+    local rankColor = GetRankColor(npcData.level)
     local message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
-    BroadcastMessage(message)
+    BroadcastMessage(message, rankColor)
     
     if SERVER then
         SyncNPCData(attacker, npcData)
@@ -116,7 +127,7 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     
     if npcData.kills % 2 == 0 and npcData.level < 15 then
         local newRank = GetRank(npcData.level)
-        BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank))
+        BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank), rankColor)
     end
 end)
 
