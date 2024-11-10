@@ -26,7 +26,7 @@ local ranks = {
 
 -- 获取军衔的函数
 local function GetRank(level)
-    return ranks[math.min(level, #ranks)]
+    return ranks[math.min(level, 15)]
 end
 
 -- NPC 数据存储
@@ -99,17 +99,17 @@ hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
     if not npcData then return end
     
     npcData.kills = npcData.kills + 1
-    npcData.level = math.floor(npcData.kills / 2) + 1
+    npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
     
     local rank = GetRank(npcData.level)
-    local message = string.format("%s级%s击败了一个敌人！", rank, npcData.name)
+    local message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
     BroadcastMessage(message)
     
     if SERVER then
         SyncNPCData(attacker, npcData)
     end
     
-    if npcData.kills % 2 == 0 then
+    if npcData.kills % 2 == 0 and npcData.level < 15 then
         local newRank = GetRank(npcData.level)
         BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank))
     end
