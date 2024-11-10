@@ -119,16 +119,15 @@ if SERVER then -- 只在服务器端处理击杀事件
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message
-        if npcData.kills % 2 == 0 and npcData.level < 15 then
-            local newRank = GetRank(npcData.level)
-            message = string.format("%s %s击败了一个敌人并晋升为%s！", rank, npcData.name, newRank)
-        else
-            message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
-        end
+        local message = string.format("%s %s击败了一个敌人！", rank, npcData.name)
         BroadcastMessage(message, rankColor)
         
         SyncNPCData(attacker, npcData)
+            
+        if npcData.kills % 2 == 0 and npcData.level < 15 then
+            local newRank = GetRank(npcData.level)
+            BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank), rankColor)
+        end
     end)
 end
 
