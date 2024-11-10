@@ -153,13 +153,23 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     local rank = GetRank(npcData.level)
     local rankColor = GetRankColor(npcData.level)
     local sw, sh = ScrW(), ScrH()
-    draw.SimpleText(
-        string.format("%s %s", rank, npcData.name),
-        "DermaLarge",
-        sw / 2,
-        sh / 1.87,
-        rankColor,
-        TEXT_ALIGN_CENTER,
-        TEXT_ALIGN_CENTER
-    )
+    
+    -- 添加黑色描边使文字更清晰
+    local text = string.format("%s %s", rank, npcData.name)
+    local x, y = sw / 2, sh / 1.87
+    local font = "DermaLarge"
+    
+    -- 绘制描边
+    for dx = -2, 2 do
+        for dy = -2, 2 do
+            draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        end
+    end
+    
+    -- 绘制主文本
+    draw.SimpleText(text, font, x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    
+    -- 添加等级和击杀信息
+    local infoText = string.format("等级: %d | 击杀: %d", npcData.level, npcData.kills)
+    draw.SimpleText(infoText, "DermaDefault", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end)
