@@ -2,7 +2,7 @@ AddCSLuaFile( )
 
 local function ofkc( pnl )
 
-	pnl:ControlHelp( "死亡信息设置" )
+	pnl:ControlHelp( "NPC 等级系统设置" )
 
 	local Default = {
 
