@@ -17,6 +17,32 @@ local npcNames = {
     "白色哀悼","遥远的桥","钓鱼人","深入敌后"
 }
 
+-- 对话池
+local taunts = {
+    "%s,你的战斗技巧还需要提高!",
+    "看来%s今天状态不太好啊~",
+    "抱歉了%s,这就是实力的差距",
+    "下次记得带上脑子再来,%s",
+    "这就是你的全部实力吗,%s?",
+    "再见了,%s,安息吧"
+}
+
+local idles = {
+    "这个地图%s真是个不错的战场",
+    "今天天气不错,适合在%s散步",
+    "听说%s这地方闹鬼,有点意思",
+    "我觉得%s这地方需要整修一下了",
+    "在%s执行任务的感觉真不错"
+}
+
+local levelups = {
+    "实力又提升了!",
+    "感觉自己无所不能!",
+    "这还不是我的最终形态!",
+    "变得更强了!",
+    "继续前进!"
+}
+
 -- 军衔系统和对应颜色
 local ranks = {
     [1] = {name = "列兵", color = Color(255, 255, 255)},  -- 白色
@@ -35,6 +61,7 @@ local ranks = {
     [14] = {name = "上将", color = Color(220, 20, 60)},   -- 猩红色
     [15] = {name = "元帅", color = Color(139, 0, 0)}      -- 深红色
 }
+
 -- 获取军衔的函数
 local function GetRank(level)
     return ranks[math.min(level, 15)].name
@@ -79,6 +106,9 @@ if SERVER then
     util.AddNetworkString("SyncNPCData")
     util.AddNetworkString("BroadcastMessage")
     util.AddNetworkString("NPCLevelUpEffect")
+    util.AddNetworkString("NPCTalk_Taunt")
+    util.AddNetworkString("NPCTalk_Idle") 
+    util.AddNetworkString("NPCTalk_LevelUp")
 
     -- 创建ConVar
     local ofkc_enabled = CreateConVar("ofkc_enabled", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用NPC等级系统 (0=关闭, 1=开启)")
@@ -112,6 +142,69 @@ if SERVER then
         net.WriteTable(data)
         net.Broadcast()
     end
+
+    -- NPC说话函数
+    local function NPCTalk(talkType, attacker, victim)
+        if talkType == "taunt" and IsValid(attacker) and IsValid(victim) then
+            local attackerData = npcs[attacker:EntIndex()]
+            local victimData = npcs[victim:EntIndex()]
+            if attackerData and victimData then
+                local message = taunts[math.random(#taunts)]
+                local formattedMessage = string.format(message, victimData.name)
+                local attackerRank = GetRank(attackerData.level)
+                local attackerColor = GetRankColor(attackerData.level)
+                
+                net.Start("NPCTalk_Taunt")
+                net.WriteString(formattedMessage)
+                net.WriteString(attackerRank)
+                net.WriteString(attackerData.name)
+                net.WriteColor(attackerColor)
+                net.Broadcast()
+            end
+        elseif talkType == "idle" and IsValid(attacker) then
+            local npcData = npcs[attacker:EntIndex()]
+            if npcData then
+                local message = idles[math.random(#idles)]
+                local formattedMessage = string.format(message, game.GetMap())
+                local npcRank = GetRank(npcData.level)
+                local npcColor = GetRankColor(npcData.level)
+                
+                net.Start("NPCTalk_Idle")
+                net.WriteString(formattedMessage)
+                net.WriteString(npcRank)
+                net.WriteString(npcData.name)
+                net.WriteColor(npcColor)
+                net.Broadcast()
+            end
+        elseif talkType == "levelup" and IsValid(attacker) then
+            local npcData = npcs[attacker:EntIndex()]
+            if npcData then
+                local message = levelups[math.random(#levelups)]
+                local npcRank = GetRank(npcData.level)
+                local npcColor = GetRankColor(npcData.level)
+                
+                net.Start("NPCTalk_LevelUp")
+                net.WriteString(message)
+                net.WriteString(npcRank)
+                net.WriteString(npcData.name)
+                net.WriteColor(npcColor)
+                net.Broadcast()
+            end
+        end
+    end
+
+    -- 随机闲聊定时器
+    timer.Create("NPCIdleChat", 10, 0, function()
+        if not ofkc_enabled:GetBool() then return end
+        
+        local allNPCs = ents.FindByClass("npc_*")
+        if #allNPCs > 0 then
+            local randomNPC = allNPCs[math.random(#allNPCs)]
+            if IsValid(randomNPC) and randomNPC:GetClass() ~= "npc_bullseye" then
+                NPCTalk("idle", randomNPC)
+            end
+        end
+    end)
 
     -- 当 NPC 生成时
     hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
@@ -156,6 +249,9 @@ if SERVER then
         local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
         local victimLevel = victimData and victimData.level or 1
         local victimColor = victimData and GetRankColor(victimData.level) or Color(255, 255, 255)
+        
+        -- 发送嘲讽消息
+        NPCTalk("taunt", attacker, npc)
         
         -- 计算获得的经验值
         local expGain = 0
@@ -236,6 +332,9 @@ if SERVER then
                 net.WriteColor(rankColor)
                 net.Broadcast()
             end
+            
+            -- 发送升级对话
+            NPCTalk("levelup", attacker)
                 
             requiredExp = GetRequiredExp(npcData.level)
         end
@@ -291,6 +390,39 @@ end
 
 -- 客户端代码
 if CLIENT then
+    local function processMessage(message, replacements)
+        for key, value in pairs(replacements) do
+            message = message:gsub(key, value)
+        end
+        return message
+    end
+
+    net.Receive("NPCTalk_Taunt", function()
+        local message = net.ReadString()
+        local rank = net.ReadString()
+        local name = net.ReadString()
+        local color = net.ReadColor()
+        
+        chat.AddText(color, rank .. " " .. name .. ": ", Color(255, 255, 255), message)
+    end)
+
+    net.Receive("NPCTalk_Idle", function()
+        local message = net.ReadString()
+        local rank = net.ReadString()
+        local name = net.ReadString()
+        local color = net.ReadColor()
+        
+        chat.AddText(color, rank .. " " .. name .. ": ", Color(255, 255, 255), message)
+    end)
+
+    net.Receive("NPCTalk_LevelUp", function()
+        local message = net.ReadString()
+        local rank = net.ReadString()
+        local name = net.ReadString()
+        local color = net.ReadColor()
+        
+        chat.AddText(color, rank .. " " .. name .. ": ", Color(255, 255, 255), message)
+    end)
 
     local xx,yy=ScrW()/1920,ScrH()/1080     --玩家屏幕分辨率与我的屏幕分辨率的比
 
