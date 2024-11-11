@@ -121,6 +121,7 @@ if SERVER then
         local victimName = victimData and victimData.name or "未知敌人"
         local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
         local victimLevel = victimData and victimData.level or 1
+        local victimColor = victimData and GetRankColor(victimData.level) or Color(255, 255, 255)
         
         -- 计算获得的经验值
         local expGain = 0
@@ -183,7 +184,9 @@ if SERVER then
                 name = npcData.name,
                 victimRank = victimRank,
                 victimName = victimName,
-                expGain = math.abs(expGain)
+                expGain = math.abs(expGain),
+                color = rankColor,
+                victimColor = victimColor
             })
         else
             BroadcastMessage(3, {
@@ -193,7 +196,8 @@ if SERVER then
                 victimName = victimName,
                 expGain = expGain,
                 level = npcData.level,
-                color = rankColor
+                color = rankColor,
+                victimColor = victimColor
             })
         end
         
@@ -254,15 +258,21 @@ if CLIENT then
             chat.AddText(data.color, string.format("%s 晋升为 %s！", 
                 data.name, data.rank))
         elseif messageType == 2 then -- 误杀消息
-            chat.AddText(Color(255, 0, 0), string.format("友军伤害！%s %s 误杀了同伴 %s %s，损失 %d 经验！",
-                data.rank, data.name, data.victimRank, data.victimName, data.expGain))
+            chat.AddText(Color(255, 255, 255), "友军伤害！",
+                data.color, data.rank .. " " .. data.name,
+                Color(255, 255, 255), " 误杀了同伴 ",
+                data.victimColor, data.victimRank .. " " .. data.victimName,
+                Color(255, 255, 255), string.format("，损失 %d 经验！", data.expGain))
         elseif messageType == 3 then -- 击杀消息
             if data.level >= 15 then
-                chat.AddText(data.color, string.format("%s %s 击败了 %s %s",
-                    data.rank, data.name, data.victimRank, data.victimName))
+                chat.AddText(data.color, data.rank .. " " .. data.name,
+                    Color(255, 255, 255), " 击败了 ",
+                    data.victimColor, data.victimRank .. " " .. data.victimName)
             else
-                chat.AddText(data.color, string.format("%s %s 击败了 %s %s，获得 %d 经验！",
-                    data.rank, data.name, data.victimRank, data.victimName, data.expGain))
+                chat.AddText(data.color, data.rank .. " " .. data.name,
+                    Color(255, 255, 255), " 击败了 ",
+                    data.victimColor, data.victimRank .. " " .. data.victimName,
+                    Color(255, 255, 255), string.format("，获得 %d 经验！", data.expGain))
             end
         end
     end)
