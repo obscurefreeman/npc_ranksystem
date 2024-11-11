@@ -2,7 +2,7 @@
 local npcNames = {
     "约翰逊","杨", "金",
     "米勒","沃克", "霍尔",
-    "威尔逊", "泰勒", "托马斯",
+    "威尔逊", "泰勒",
     "杰克逊", "汤普森", "加西亚",
     "马丁内斯", "罗宾逊", "弗兰克",
     "罗德里格斯", "路易吉", "李",
@@ -14,7 +14,7 @@ local npcNames = {
     "探戈","猎狐者","狐狸",
     "无名","赭石","睡衣派对",
     "圣诞老人","邪恶降临","一只巴尼",
-    "拍肉","半条命3","柔软的床","美妙的梦"
+    "拍肉","半条命3","柔软的床","美妙的梦","铁轨英雄"
 }
 
 -- 军衔系统和对应颜色
@@ -35,7 +35,6 @@ local ranks = {
     [14] = {name = "上将", color = Color(220, 20, 60)},   -- 猩红色
     [15] = {name = "元帅", color = Color(139, 0, 0)}      -- 深红色
 }
-
 -- 获取军衔的函数
 local function GetRank(level)
     return ranks[math.min(level, 15)].name
@@ -44,6 +43,17 @@ end
 -- 获取军衔颜色的函数
 local function GetRankColor(level)
     return ranks[math.min(level, 15)].color
+end
+
+-- 获取升级所需经验的函数
+local function GetRequiredExp(level)
+    if level <= 5 then
+        return 100
+    elseif level <= 10 then
+        return 120
+    else
+        return 150
+    end
 end
 
 -- NPC 数据存储
@@ -61,6 +71,7 @@ if SERVER then
         net.WriteString(npcData.name)
         net.WriteUInt(npcData.level, 8)
         net.WriteUInt(npcData.kills, 8)
+        net.WriteUInt(npcData.exp, 16)
         net.WriteString(npcData.class or "")
         net.Broadcast()
     end
@@ -85,6 +96,7 @@ if SERVER then
                 name = npcNames[math.random(#npcNames)],
                 level = 1,
                 kills = 0,
+                exp = 0,
                 class = ent:GetClass()
             }
             
@@ -106,25 +118,39 @@ if SERVER then
         local victimData = npcs[npc:EntIndex()]
         local victimName = victimData and victimData.name or "未知敌人"
         local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
-        local victimClass = victimData and victimData.class
-        local attackerClass = npcData.class
+        local victimLevel = victimData and victimData.level or 1
         
+        -- 计算获得的经验值
+        local baseExp = math.max(80, victimLevel * 100 * (2/3)) -- 基础经验为目标等级*20的2/3,最少80
+        local expGain = baseExp + math.random(-20, 20) -- 随机浮动20点经验
+        npcData.exp = npcData.exp + expGain
         npcData.kills = npcData.kills + 1
-        npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
+        
+        -- 检查是否升级
+        local requiredExp = GetRequiredExp(npcData.level)
+        while npcData.exp >= requiredExp and npcData.level < 15 do
+            npcData.exp = npcData.exp - requiredExp
+            npcData.level = npcData.level + 1
+            
+            -- 刷新NPC血量
+            local maxHealth = attacker:GetMaxHealth()
+            attacker:SetHealth(maxHealth)
+            
+            local newRank = GetRank(npcData.level)
+            local rankColor = GetRankColor(npcData.level)
+            BroadcastMessage(string.format("%s 晋升为 %s！", 
+                npcData.name, newRank), rankColor)
+                
+            requiredExp = GetRequiredExp(npcData.level)
+        end
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message = string.format("%s %s 击败了 %s %s！", 
-            rank, npcData.name, victimRank, victimName)
+        local message = string.format("%s %s 击败了 %s %s，获得 %d 经验！", 
+            rank, npcData.name, victimRank, victimName, expGain)
         BroadcastMessage(message, rankColor)
         
         SyncNPCData(attacker, npcData)
-            
-        if npcData.kills % 2 == 0 and npcData.level < 15 then
-            local newRank = GetRank(npcData.level)
-            BroadcastMessage(string.format("%s 晋升为 %s！", 
-                npcData.name, newRank), rankColor)
-        end
         
         timer.Simple(0.1, function()
             npcs[npc:EntIndex()] = nil
@@ -167,6 +193,7 @@ if CLIENT then
             name = net.ReadString(),
             level = net.ReadUInt(8),
             kills = net.ReadUInt(8),
+            exp = net.ReadUInt(16),
             class = net.ReadString()
         }
     end)
@@ -220,7 +247,9 @@ if CLIENT then
         
         draw.SimpleText(text, "ofkctextlarge", x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         
-        local infoText = string.format("等级: %d | 击杀: %d", npcData.level, npcData.kills)
+        local requiredExp = GetRequiredExp(npcData.level)
+        local infoText = string.format("等级: %d | 击杀: %d | 经验: %d/%d", 
+            npcData.level, npcData.kills, npcData.exp, requiredExp)
         draw.SimpleText(infoText, "ofkctext", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end)
 end
