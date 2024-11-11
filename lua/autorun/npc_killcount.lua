@@ -1,35 +1,15 @@
 -- NPC 名字池
 local npcNames = {
-    "约翰逊",
-    "威廉姆斯",
-    "史密斯",
-    "安德森",
-    "布朗",
-    "米勒",
-    "威尔逊",
-    "泰勒",
-    "托马斯",
-    "杰克逊",
-    "怀特",
-    "哈里斯",
-    "马丁",
-    "汤普森",
-    "加西亚",
-    "马丁内斯",
-    "罗宾逊",
-    "克拉克",
-    "罗德里格斯",
-    "路易斯",
-    "李",
-    "沃克",
-    "霍尔",
-    "艾伦",
-    "杨",
-    "埃尔南德斯",
-    "金",
-    "赖特",
-    "洛佩兹",
-    "希尔"
+    "约翰逊", "威廉姆斯", "史密斯",
+    "安德森", "布朗", "米勒",
+    "威尔逊", "泰勒", "托马斯",
+    "杰克逊", "怀特", "哈里斯",
+    "马丁", "汤普森", "加西亚",
+    "马丁内斯", "罗宾逊", "克拉克",
+    "罗德里格斯", "路易斯", "李",
+    "沃克", "霍尔", "艾伦",
+    "杨", "埃尔南德斯", "金",
+    "赖特", "洛佩兹", "希尔"
 }
 
 -- 军衔系统和对应颜色
@@ -44,11 +24,11 @@ local ranks = {
     [8] = {name = "少校", color = Color(135, 206, 250)},  -- 天蓝色
     [9] = {name = "中校", color = Color(30, 144, 255)},   -- 道奇蓝
     [10] = {name = "上校", color = Color(0, 0, 205)},     -- 中蓝色
-    [11] = {name = "大校", color = Color(138, 43, 226)},  -- 紫罗兰色
+    [11] = {name = "准将", color = Color(138, 43, 226)},  -- 紫罗兰色
     [12] = {name = "少将", color = Color(255, 215, 0)},   -- 金色
     [13] = {name = "中将", color = Color(255, 69, 0)},    -- 红橙色
     [14] = {name = "上将", color = Color(220, 20, 60)},   -- 猩红色
-    [15] = {name = "大将", color = Color(139, 0, 0)}      -- 深红色
+    [15] = {name = "元帅", color = Color(139, 0, 0)}      -- 深红色
 }
 
 -- 获取军衔的函数
@@ -196,15 +176,27 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     local rankColor = GetRankColor(npcData.level)
     local sw, sh = ScrW(), ScrH()
     
-    -- 添加黑色描边使文字更清晰
     local text = string.format("%s %s", rank, npcData.name)
     local x, y = sw / 2, sh / 1.87
     local font = "DermaLarge"
     
-    -- 绘制描边
-    for dx = -2, 2 do
-        for dy = -2, 2 do
-            draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    -- 判断颜色深浅
+    local r, g, b = rankColor.r, rankColor.g, rankColor.b
+    local brightness = (r * 299 + g * 587 + b * 114) / 1000
+    
+    -- 如果颜色较深，使用白色描边
+    if brightness < 128 then
+        for dx = -2, 2 do
+            for dy = -2, 2 do
+                draw.SimpleText(text, font, x + dx, y + dy, Color(255, 255, 255, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            end
+        end
+    else
+        -- 如果颜色较浅，使用黑色描边
+        for dx = -2, 2 do
+            for dy = -2, 2 do
+                draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            end
         end
     end
     
