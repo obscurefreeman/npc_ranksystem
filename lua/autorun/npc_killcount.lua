@@ -82,12 +82,14 @@ if SERVER then
     util.AddNetworkString("NPCLevelUpEffect")
 
     -- 创建ConVar
-    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "1", FCVAR_ARCHIVE, "设置NPC是否随机等级 (0=从1级开始, 1=随机等级)")
+    local ofkc_enabled = CreateConVar("ofkc_enabled", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用NPC等级系统 (0=关闭, 1=开启)")
+    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置NPC是否随机等级 (0=从1级开始, 1=随机等级)")
     local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
     local ofkc_npc_levelup_effect = CreateConVar("ofkc_npc_levelup_effect", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级特效 (0=关闭, 1=开启)")
     local ofkc_npc_levelup_message = CreateConVar("ofkc_npc_levelup_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级播报 (0=关闭, 1=开启)")
     local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用击杀播报 (0=关闭, 1=开启)")
-    local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE, "设置同类型NPC击杀是否获得经验 (0=惩罚经验, 1=获得经验)")
+    local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置同类型NPC击杀是否获得经验 (0=惩罚经验, 1=获得经验)")
+    local ofkc_npc_levelup_heal = CreateConVar("ofkc_npc_levelup_heal", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "晋级时是否刷新血量 (0=关闭, 1=开启)")
 
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
@@ -114,6 +116,7 @@ if SERVER then
 
     -- 当 NPC 生成时
     hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
+        if not ofkc_enabled:GetBool() then return end
         if not IsValid(ent) or not ent:IsNPC() then return end
         if ent:GetClass() == "npc_bullseye" then return end
         
@@ -140,6 +143,7 @@ if SERVER then
 
     -- 当 NPC 击杀其他 NPC 时
     hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
+        if not ofkc_enabled:GetBool() then return end
         if not IsValid(npc) or not IsValid(attacker) then return end
         if not npc:IsNPC() or not attacker:IsNPC() then return end
         if attacker:GetClass() == "npc_bullseye" or npc:GetClass() == "npc_bullseye" then return end
@@ -210,8 +214,10 @@ if SERVER then
             npcData.level = npcData.level + 1
             
             -- 刷新NPC血量
-            local maxHealth = attacker:GetMaxHealth()
-            attacker:SetHealth(maxHealth)
+            if ofkc_npc_levelup_heal:GetBool() then
+                local maxHealth = attacker:GetMaxHealth()
+                attacker:SetHealth(maxHealth)
+            end
             
             local newRank = GetRank(npcData.level)
             local rankColor = GetRankColor(npcData.level)
@@ -332,6 +338,7 @@ if CLIENT then
 
     -- 渲染NPC升级特效
     hook.Add("PostDrawOpaqueRenderables", "RenderNPCLevelUpEffect", function()
+        if not GetConVar("ofkc_enabled"):GetBool() then return end
         for npc, effectData in pairs(levelUpEffects) do
             if IsValid(npc) then
                 local timeElapsed = CurTime() - effectData.startTime
@@ -406,6 +413,7 @@ if CLIENT then
 
     -- 显示 NPC 信息
     hook.Add("HUDPaint", "DisplayNPCInfo", function()
+        if not GetConVar("ofkc_enabled"):GetBool() then return end
         local ply = LocalPlayer()
         if not IsValid(ply) then return end
         
@@ -463,6 +471,7 @@ if CLIENT then
 
     -- 在NPC头顶显示信息
     hook.Add("PostDrawTranslucentRenderables", "DrawNPCOverheadInfo", function()
+        if not GetConVar("ofkc_enabled"):GetBool() then return end
         if GetConVar("ofkc_npc_text_mode"):GetInt() ~= 1 then return end
 
         local ply = LocalPlayer()
