@@ -198,6 +198,9 @@ if SERVER then
     local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用击杀播报 (0=关闭, 1=开启)")
     local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置同类型NPC击杀是否获得经验 (0=惩罚经验, 1=获得经验)")
     local ofkc_npc_levelup_heal = CreateConVar("ofkc_npc_levelup_heal", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "晋级时是否刷新血量 (0=关闭, 1=开启)")
+    local ofkc_npc_taunt = CreateConVar("ofkc_npc_taunt", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用NPC嘲讽 (0=关闭, 1=开启)")
+    local ofkc_npc_idle_chat = CreateConVar("ofkc_npc_idle_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用NPC闲聊 (0=关闭, 1=开启)")
+    local ofkc_npc_levelup_chat = CreateConVar("ofkc_npc_levelup_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用NPC晋级讲话 (0=关闭, 1=开启)")
 
     -- 处理消息替换的函数
     local function processMessage(message, replacements)
@@ -233,6 +236,7 @@ if SERVER then
     -- NPC说话函数
     local function NPCTalk(talkType, attacker, victim)
         if talkType == "taunt" and IsValid(attacker) and IsValid(victim) then
+            if not ofkc_npc_taunt:GetBool() then return end
             local attackerData = npcs[attacker:EntIndex()]
             local victimData = npcs[victim:EntIndex()]
             if attackerData and victimData then
@@ -258,6 +262,7 @@ if SERVER then
                 end)
             end
         elseif talkType == "idle" and IsValid(attacker) then
+            if not ofkc_npc_idle_chat:GetBool() then return end
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
                 local message = idles[math.random(#idles)]
@@ -278,6 +283,7 @@ if SERVER then
                 net.Broadcast()
             end
         elseif talkType == "levelup" and IsValid(attacker) then
+            if not ofkc_npc_levelup_chat:GetBool() then return end
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
                 timer.Simple(math.random(2, 5), function()
@@ -304,7 +310,7 @@ if SERVER then
 
     -- 随机闲聊定时器
     timer.Create("NPCIdleChat", 10, 0, function()
-        if not ofkc_enabled:GetBool() then return end
+        if not ofkc_enabled:GetBool() or not ofkc_npc_idle_chat:GetBool() then return end
         
         local allNPCs = ents.FindByClass("npc_*")
         if #allNPCs > 0 then

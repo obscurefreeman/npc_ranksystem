@@ -38,6 +38,15 @@ local function ofkc( pnl )
 	pnl:CheckBox( "晋级增益" , "ofkc_npc_levelup_heal" )
     pnl:Help("晋级时是否刷新血量。")
 
+    pnl:CheckBox( "NPC 文字嘲讽" , "ofkc_npc_taunt" )
+    pnl:Help("是否启用NPC嘲讽。")
+
+    pnl:CheckBox( "NPC 文字闲聊" , "ofkc_npc_idle_chat" )
+    pnl:Help("是否启用NPC闲聊。")
+
+    pnl:CheckBox( "NPC 晋级文字" , "ofkc_npc_levelup_chat" )
+    pnl:Help("NPC晋级时是否讲话。")
+
 end
 
 hook.Add( "PopulateToolMenu", "OFKCMenus", function( )
