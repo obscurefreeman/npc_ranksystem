@@ -19,28 +19,50 @@ local npcNames = {
 
 -- 对话池
 local taunts = {
-    "%s,你的战斗技巧还需要提高!",
-    "看来%s今天状态不太好啊~",
-    "抱歉了%s,这就是实力的差距",
-    "下次记得带上脑子再来,%s",
-    "这就是你的全部实力吗,%s?",
-    "再见了,%s,安息吧"
+    "/victim/,你的战斗技巧还需要提高！",
+    "看来/victim/今天状态不太好啊~",
+    "抱歉了/victim/,这就是实力的差距！",
+    "下次记得带上脑子再来,/victim/！",
+    "这就是你的全部实力吗,/victim/？",
+    "再见了/victim/,安息吧！",
+    "在这个美好的日子里送你上路,/victim/！",
+    "让你见识一下什么叫真正的实力,/victim/！",
+    "你太弱了/victim/,连热身都算不上！",
+    "哈哈，/victim/,下辈子你可要当心啊！",
+    "你是怎么晋升到/victimrank/的？",
+    "你的等级很高,可惜你遇上了我！",
+    "你已经死了,我的朋友！",
+    "向你致敬，/victim//victimrank/",
+    "/victim//victimrank/？可惜你现在是/victim/“布娃娃”",
+    "你现在就像个布娃娃一样弱！",
+    "我可是/rank/，你算老几？"
 }
 
 local idles = {
-    "这个地图%s真是个不错的战场",
-    "今天天气不错,适合在%s散步",
-    "听说%s这地方闹鬼,有点意思",
-    "我觉得%s这地方需要整修一下了",
-    "在%s执行任务的感觉真不错"
+    "这个地图/map/真是个不错的战场！",
+    "今天天气不错,适合在/map/散步。",
+    "听说/map/这地方闹鬼,有点意思。",
+    "我觉得/map/这地方需要整修一下了。",
+    "在/map/战斗的感觉真不错！",
+    "/map/的风景真美！",
+    "在/map/度过的第1天。",
+    "不知道/map/的另一边是什么样子？",
+    "希望/map/能一直这么混乱。",
 }
 
 local levelups = {
-    "实力又提升了!",
-    "感觉自己无所不能!",
-    "这还不是我的最终形态!",
-    "变得更强了!",
-    "继续前进!"
+    "实力又提升了！",
+    "感觉自己无所不能！",
+    "这还不是我的最终形态！",
+    "变得更强了！",
+    "继续前进！",
+    "迎来了新的突破！",
+    "让对手们颤抖吧！",
+    "这份力量,让我感到兴奋！",
+    "没想到我还能变得更强！",
+    "这就是晋升的感觉吗？",
+    "我现在就像开了挂一样强！",
+    "我也当上/rank/了！",
 }
 
 -- 军衔系统和对应颜色
@@ -120,6 +142,14 @@ if SERVER then
     local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置同类型NPC击杀是否获得经验 (0=惩罚经验, 1=获得经验)")
     local ofkc_npc_levelup_heal = CreateConVar("ofkc_npc_levelup_heal", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "晋级时是否刷新血量 (0=关闭, 1=开启)")
 
+    -- 处理消息替换的函数
+    local function processMessage(message, replacements)
+        for key, value in pairs(replacements) do
+            message = message:gsub(key, value)
+        end
+        return message
+    end
+
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
         net.Start("SyncNPCData")
@@ -150,7 +180,11 @@ if SERVER then
             local victimData = npcs[victim:EntIndex()]
             if attackerData and victimData then
                 local message = taunts[math.random(#taunts)]
-                local formattedMessage = string.format(message, victimData.name)
+                local replacements = {
+                    ["/victim/"] = victimData.name,
+                    ["/map/"] = game.GetMap()
+                }
+                local formattedMessage = processMessage(message, replacements)
                 local attackerRank = GetRank(attackerData.level)
                 local attackerColor = GetRankColor(attackerData.level)
                 
@@ -165,7 +199,10 @@ if SERVER then
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
                 local message = idles[math.random(#idles)]
-                local formattedMessage = string.format(message, game.GetMap())
+                local replacements = {
+                    ["/map/"] = game.GetMap()
+                }
+                local formattedMessage = processMessage(message, replacements)
                 local npcRank = GetRank(npcData.level)
                 local npcColor = GetRankColor(npcData.level)
                 
@@ -180,11 +217,15 @@ if SERVER then
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
                 local message = levelups[math.random(#levelups)]
+                local replacements = {
+                    ["/map/"] = game.GetMap()
+                }
+                local formattedMessage = processMessage(message, replacements)
                 local npcRank = GetRank(npcData.level)
                 local npcColor = GetRankColor(npcData.level)
                 
                 net.Start("NPCTalk_LevelUp")
-                net.WriteString(message)
+                net.WriteString(formattedMessage)
                 net.WriteString(npcRank)
                 net.WriteString(npcData.name)
                 net.WriteColor(npcColor)
@@ -390,12 +431,6 @@ end
 
 -- 客户端代码
 if CLIENT then
-    local function processMessage(message, replacements)
-        for key, value in pairs(replacements) do
-            message = message:gsub(key, value)
-        end
-        return message
-    end
 
     net.Receive("NPCTalk_Taunt", function()
         local message = net.ReadString()
