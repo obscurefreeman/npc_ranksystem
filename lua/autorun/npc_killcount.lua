@@ -69,8 +69,11 @@ if SERVER then
     util.AddNetworkString("NPCLevelUpEffect")
 
     -- 创建ConVar
-    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "0", FCVAR_ARCHIVE, "设置NPC是否随机等级 (0=从1级开始, 1=随机等级)")
-    local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
+    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "1", FCVAR_ARCHIVE, "设置NPC是否随机等级 (0=从1级开始, 1=随机等级)")
+    local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
+    local ofkc_npc_levelup_effect = CreateConVar("ofkc_npc_levelup_effect", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级特效 (0=关闭, 1=开启)")
+    local ofkc_npc_levelup_message = CreateConVar("ofkc_npc_levelup_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级播报 (0=关闭, 1=开启)")
+    local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用击杀播报 (0=关闭, 1=开启)")
 
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
@@ -86,6 +89,9 @@ if SERVER then
 
     -- 发送聊天消息的函数
     local function BroadcastMessage(messageType, data)
+        if messageType == 1 and not ofkc_npc_levelup_message:GetBool() then return end
+        if (messageType == 2 or messageType == 3) and not ofkc_npc_kill_message:GetBool() then return end
+        
         net.Start("BroadcastMessage")
         net.WriteUInt(messageType, 4) -- 消息类型
         net.WriteTable(data)
@@ -101,7 +107,7 @@ if SERVER then
             if not IsValid(ent) then return end
             
             local initialLevel = 1
-            if npc_random_level:GetBool() then
+            if ofkc_npc_random_level:GetBool() then
                 initialLevel = math.random(1, 15)
             end
             
@@ -178,10 +184,12 @@ if SERVER then
             })
             
             -- 发送升级特效
-            net.Start("NPCLevelUpEffect")
-            net.WriteEntity(attacker)
-            net.WriteColor(rankColor)
-            net.Broadcast()
+            if ofkc_npc_levelup_effect:GetBool() then
+                net.Start("NPCLevelUpEffect")
+                net.WriteEntity(attacker)
+                net.WriteColor(rankColor)
+                net.Broadcast()
+            end
                 
             requiredExp = GetRequiredExp(npcData.level)
         end
