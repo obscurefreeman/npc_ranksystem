@@ -87,6 +87,7 @@ if SERVER then
     local ofkc_npc_levelup_effect = CreateConVar("ofkc_npc_levelup_effect", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级特效 (0=关闭, 1=开启)")
     local ofkc_npc_levelup_message = CreateConVar("ofkc_npc_levelup_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用晋级播报 (0=关闭, 1=开启)")
     local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "是否启用击杀播报 (0=关闭, 1=开启)")
+    local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE, "设置同类型NPC击杀是否获得经验 (0=惩罚经验, 1=获得经验)")
 
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
@@ -162,10 +163,36 @@ if SERVER then
             expGain = 0
         else
             if attacker:GetClass() == npc:GetClass() then
-                -- 同类型NPC击杀扣除经验
-                expGain = -20 + math.random(-5, 5)
-                isFriendlyFire = true
-                npcData.exp = math.max(0, npcData.exp + expGain) -- 确保经验不会为负
+                if ofkc_npc_friendly_fire:GetBool() then
+                    -- 同类型NPC击杀获得经验
+                    local baseExp = math.max(40, victimLevel * 50 * (2/3))
+                    expGain = baseExp + math.random(-10, 10)
+                    npcData.exp = npcData.exp + expGain
+                else
+                    -- 同类型NPC击杀扣除经验
+                    expGain = -20 + math.random(-5, 5)
+                    isFriendlyFire = true
+                    npcData.exp = npcData.exp + expGain
+                    
+                    -- 如果经验为负，且等级大于1，则降级
+                    if npcData.exp < 0 and npcData.level > 1 then
+                        npcData.level = npcData.level - 1
+                        npcData.exp = GetRequiredExp(npcData.level) - math.abs(npcData.exp)
+                        
+                        local newRank = GetRank(npcData.level)
+                        local rankColor = GetRankColor(npcData.level)
+                        
+                        -- 发送降级消息
+                        BroadcastMessage(1, {
+                            name = npcData.name,
+                            rank = newRank,
+                            color = rankColor,
+                            isDowngrade = true
+                        })
+                    else
+                        npcData.exp = math.max(0, npcData.exp) -- 确保经验不会为负
+                    end
+                end
             else
                 -- 不同类型NPC击杀获得经验
                 local baseExp = math.max(80, victimLevel * 100 * (2/3))
@@ -193,7 +220,8 @@ if SERVER then
             BroadcastMessage(1, {
                 name = npcData.name,
                 rank = newRank,
-                color = rankColor
+                color = rankColor,
+                isDowngrade = false
             })
             
             -- 发送升级特效
@@ -348,9 +376,14 @@ if CLIENT then
         local messageType = net.ReadUInt(4)
         local data = net.ReadTable()
         
-        if messageType == 1 then -- 升级消息
-            chat.AddText(data.color, string.format("%s 晋升为 %s！", 
-                data.name, data.rank))
+        if messageType == 1 then -- 升级/降级消息
+            if data.isDowngrade then
+                chat.AddText(data.color, string.format("%s 降级为 %s！", 
+                    data.name, data.rank))
+            else
+                chat.AddText(data.color, string.format("%s 晋升为 %s！", 
+                    data.name, data.rank))
+            end
         elseif messageType == 2 then -- 误杀消息
             chat.AddText(Color(255, 255, 255), "友军伤害！",
                 data.color, data.rank .. " " .. data.name,
