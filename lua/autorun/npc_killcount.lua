@@ -13,8 +13,8 @@ local npcNames = {
     "探戈","猎狐者","狐狸",
     "无名氏","赭石","睡衣派对",
     "圣诞老人","邪恶降临","一只巴尼",
-    "盖瑞猫咪","半条命3","柔软的床","进入梦乡","睡眠",
-    "白色哀悼","遥远的桥","钓鱼人"
+    "盖瑞猫咪","半条命3","柔软的床","进入梦乡","渴望睡眠",
+    "白色哀悼","钓鱼人"
 }
 
 -- 对话池
@@ -60,7 +60,8 @@ local taunts = {
     "兄弟，你太菜了，还是回新手村吧！",
     "哭吧，/victim//victimrank/。",
     "是啊，下次记得别死，/victim/", 
-    "/rank/爆杀/victimrank/，这把炸鱼局。",
+    "/rank/爆杀/victimrank/，666，这把炸鱼局。",
+    "我从三岁就开始玩这个游戏了，/victim//victimrank/。"
 }
 
 local idles = {
@@ -236,26 +237,24 @@ if SERVER then
             local victimData = npcs[victim:EntIndex()]
             if attackerData and victimData then
                 timer.Simple(math.random(2, 5), function()
-                    if IsValid(attacker) then
-                        local message = taunts[math.random(#taunts)]
-                        local replacements = {
-                            ["/victim/"] = victimData.name,
-                            ["/victimrank/"] = GetRank(victimData.level),
-                            ["/rank/"] = GetRank(attackerData.level),
-                            ["/name/"] = attackerData.name,
-                            ["/map/"] = game.GetMap()
-                        }
-                        local formattedMessage = processMessage(message, replacements)
-                        local attackerRank = GetRank(attackerData.level)
-                        local attackerColor = GetRankColor(attackerData.level)
-                        
-                        net.Start("NPCTalk_Taunt")
-                        net.WriteString(formattedMessage)
-                        net.WriteString(attackerRank)
-                        net.WriteString(attackerData.name)
-                        net.WriteColor(attackerColor)
-                        net.Broadcast()
-                    end
+                    local message = taunts[math.random(#taunts)]
+                    local replacements = {
+                        ["/victim/"] = victimData.name,
+                        ["/victimrank/"] = GetRank(victimData.level),
+                        ["/rank/"] = GetRank(attackerData.level),
+                        ["/name/"] = attackerData.name,
+                        ["/map/"] = game.GetMap()
+                    }
+                    local formattedMessage = processMessage(message, replacements)
+                    local attackerRank = GetRank(attackerData.level)
+                    local attackerColor = GetRankColor(attackerData.level)
+                    
+                    net.Start("NPCTalk_Taunt")
+                    net.WriteString(formattedMessage)
+                    net.WriteString(attackerRank)
+                    net.WriteString(attackerData.name)
+                    net.WriteColor(attackerColor)
+                    net.Broadcast()
                 end)
             end
         elseif talkType == "idle" and IsValid(attacker) then
@@ -281,22 +280,24 @@ if SERVER then
         elseif talkType == "levelup" and IsValid(attacker) then
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
-                local message = levelups[math.random(#levelups)]
-                local replacements = {
-                    ["/rank/"] = GetRank(npcData.level),
-                    ["/name/"] = npcData.name,
-                    ["/map/"] = game.GetMap()
-                }
-                local formattedMessage = processMessage(message, replacements)
-                local npcRank = GetRank(npcData.level)
-                local npcColor = GetRankColor(npcData.level)
-                
-                net.Start("NPCTalk_LevelUp")
-                net.WriteString(formattedMessage)
-                net.WriteString(npcRank)
-                net.WriteString(npcData.name)
-                net.WriteColor(npcColor)
-                net.Broadcast()
+                timer.Simple(math.random(2, 5), function()
+                    local message = levelups[math.random(#levelups)]
+                    local replacements = {
+                        ["/rank/"] = GetRank(npcData.level),
+                        ["/name/"] = npcData.name,
+                        ["/map/"] = game.GetMap()
+                    }
+                    local formattedMessage = processMessage(message, replacements)
+                    local npcRank = GetRank(npcData.level)
+                    local npcColor = GetRankColor(npcData.level)
+                    
+                    net.Start("NPCTalk_LevelUp")
+                    net.WriteString(formattedMessage)
+                    net.WriteString(npcRank)
+                    net.WriteString(npcData.name)
+                    net.WriteColor(npcColor)
+                    net.Broadcast()
+                end)
             end
         end
     end
