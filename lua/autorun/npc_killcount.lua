@@ -123,9 +123,9 @@ local taunts = {
     "Did everyone see my kill just now? That was awesome!",
     "Looks like you're only good at talking, /victim/.",
     "Brother, you're too noob, go back to tutorial!",
-    "Cry, /victim/ /victimrank/.",
+    "Cry, /victim/ /victimrank/!",
     "Yeah, try not to die next time, /victim/", 
-    "/rank/ destroyed /victimrank/, 666, this is a pub stomp.",
+    "/rank/ destroyed /victimrank/, this is a pub stomp.",
     "I've been playing this game since I was three, /victim/ /victimrank/."
     }
 }
@@ -159,7 +159,7 @@ local idles = {
     "我最近在玩一个新游戏，叫《半条命：老鼠》，你们玩过吗？",
     "我没有买CSS，所以地图里全都是紫黑格，真是服了！",
     "我想玩 VR 模组，可惜我没有 VR 。",
-    "折寿啦！刚刚ARC又发布新的武器包了！",
+    "折寿啦！刚刚Arctic发布新的武器包了！",
     "天哪，这张地图的导航网格太烂了，NPC简直寸步难行！",
     "是的，但那只是一个游戏理论",
     "你们在地图中看到过一个称着伞的男人吗？",
@@ -191,16 +191,16 @@ local idles = {
     "Anything new in the Workshop lately?",
     "Do you think those low-quality FNAF saves ruined the Workshop?",
     "Guys, you should check this out: https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    "Like my model? I downloaded a new skin!",
+    "Like my model? I downloaded a new model!",
     "Can you like my mod? It's on the Workshop.",
     "I've been playing a new game called 'Half-Life: Mouse', have you tried it?",
     "I don't have CSS, so the map is all purple and black, so annoying!",
     "I want to play VR mods, but I don't have VR.",
-    "Oh my life! ARC just released a new weapon pack!",
+    "Oh my life! Arctic just released a new weapon pack!",
     "God, the navmesh on this map is terrible, NPCs can barely move!",
     "That's Just a Theory, A Game Theory.",
     "Have you seen a man with an umbrella in the map?",
-    "I want to play the nuke mod. I want nukes ~ Want nukes ~",
+    "I want to play the nuke mod.",
     "Do you know the 'UC' weapon pack? I love how these weapons feel.",
     "Steam sale started, what did you buy?",
     "I am the master of this server! Bow before me!"
@@ -272,8 +272,8 @@ local ranks = {
         [2] = {name = "Corporal", color = Color(255, 127, 80)},
         [3] = {name = "Sergeant", color = Color(255, 165, 0)},
         [4] = {name = "Staff Sergeant", color = Color(255, 215, 0)},
-        [5] = {name = "Second Lieutenant", color = Color(144, 238, 144)},
-        [6] = {name = "First Lieutenant", color = Color(0, 255, 127)},
+        [5] = {name = "Ensign", color = Color(144, 238, 144)},
+        [6] = {name = "Lieutenant", color = Color(0, 255, 127)},
         [7] = {name = "Captain", color = Color(34, 139, 34)},
         [8] = {name = "Major", color = Color(135, 206, 250)},
         [9] = {name = "Lieutenant Colonel", color = Color(30, 144, 255)},
@@ -919,8 +919,8 @@ if CLIENT then
             local scale = math.Clamp(math.sqrt(1 - (distance / 1000)), 0.1, 1)
 
             cam.Start3D2D(pos, ang, 0.1 * scale)
-                local rank = GetRank(npcData.level)
-                local rankColor = GetRankColor(npcData.level)
+                local rank = GetRank(npcData.level, language)
+                local rankColor = GetRankColor(npcData.level, language)
                 local text = string.format("%s %s", rank, npcData.name)
 
                 -- 绘制文字阴影
@@ -930,11 +930,11 @@ if CLIENT then
 
                 local infoText
                 if npcData.level >= 15 then
-                    infoText = string.format("等级: %d | 击杀: %d | 经验: 满级", 
+                    infoText = string.format(language == "zh-CN" and "等级: %d | 击杀: %d | 经验: 满级" or "Level: %d | Kills: %d | XP: MAX", 
                         npcData.level, npcData.kills)
                 else
                     local requiredExp = GetRequiredExp(npcData.level)
-                    infoText = string.format("等级: %d | 击杀: %d | 经验: %d/%d", 
+                    infoText = string.format(language == "zh-CN" and "等级: %d | 击杀: %d | 经验: %d/%d" or "Level: %d | Kills: %d | XP: %d/%d", 
                         npcData.level, npcData.kills, npcData.exp, requiredExp)
                 end
 
