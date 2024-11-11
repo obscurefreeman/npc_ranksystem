@@ -47,7 +47,9 @@ end
 
 -- 获取升级所需经验的函数
 local function GetRequiredExp(level)
-    if level <= 5 then
+    if level >= 15 then
+        return 0
+    elseif level <= 5 then
         return 100
     elseif level <= 10 then
         return 120
@@ -121,9 +123,26 @@ if SERVER then
         local victimLevel = victimData and victimData.level or 1
         
         -- 计算获得的经验值
-        local baseExp = math.max(80, victimLevel * 100 * (2/3)) -- 基础经验为目标等级*20的2/3,最少80
-        local expGain = baseExp + math.random(-20, 20) -- 随机浮动20点经验
-        npcData.exp = npcData.exp + expGain
+        local expGain = 0
+        local isFriendlyFire = false
+        
+        -- 如果已经满级则不再获得经验
+        if npcData.level >= 15 then
+            expGain = 0
+        else
+            if attacker:GetClass() == npc:GetClass() then
+                -- 同类型NPC击杀扣除经验
+                expGain = -20 + math.random(-5, 5)
+                isFriendlyFire = true
+                npcData.exp = math.max(0, npcData.exp + expGain) -- 确保经验不会为负
+            else
+                -- 不同类型NPC击杀获得经验
+                local baseExp = math.max(80, victimLevel * 100 * (2/3))
+                expGain = baseExp + math.random(-20, 20)
+                npcData.exp = npcData.exp + expGain
+            end
+        end
+        
         npcData.kills = npcData.kills + 1
         
         -- 检查是否升级
@@ -144,11 +163,30 @@ if SERVER then
             requiredExp = GetRequiredExp(npcData.level)
         end
         
+        -- 如果已经满级，将经验设为0
+        if npcData.level >= 15 then
+            npcData.exp = 0
+        end
+        
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message = string.format("%s %s 击败了 %s %s，获得 %d 经验！", 
-            rank, npcData.name, victimRank, victimName, expGain)
-        BroadcastMessage(message, rankColor)
+        
+        -- 根据是否误杀显示不同消息
+        local message
+        if isFriendlyFire then
+            message = string.format("友军伤害！%s %s 误杀了同伴 %s %s，损失 %d 经验！", 
+                rank, npcData.name, victimRank, victimName, math.abs(expGain))
+            BroadcastMessage(message, Color(255, 0, 0)) -- 误杀使用红色显示
+        else
+            if npcData.level >= 15 then
+                message = string.format("%s %s 击败了 %s %s", 
+                    rank, npcData.name, victimRank, victimName)
+            else
+                message = string.format("%s %s 击败了 %s %s，获得 %d 经验！", 
+                    rank, npcData.name, victimRank, victimName, expGain)
+            end
+            BroadcastMessage(message, rankColor)
+        end
         
         SyncNPCData(attacker, npcData)
         
@@ -247,9 +285,15 @@ if CLIENT then
         
         draw.SimpleText(text, "ofkctextlarge", x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         
-        local requiredExp = GetRequiredExp(npcData.level)
-        local infoText = string.format("等级: %d | 击杀: %d | 经验: %d/%d", 
-            npcData.level, npcData.kills, npcData.exp, requiredExp)
+        local infoText
+        if npcData.level >= 15 then
+            infoText = string.format("等级: %d | 击杀: %d | 经验: 满级", 
+                npcData.level, npcData.kills)
+        else
+            local requiredExp = GetRequiredExp(npcData.level)
+            infoText = string.format("等级: %d | 击杀: %d | 经验: %d/%d", 
+                npcData.level, npcData.kills, npcData.exp, requiredExp)
+        end
         draw.SimpleText(infoText, "ofkctext", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end)
 end
