@@ -13,7 +13,7 @@ local npcNames = {
     "探戈","猎狐者","狐狸",
     "无名氏","赭石","睡衣派对",
     "圣诞老人","邪恶降临","一只巴尼",
-    "拍肉","半条命3","柔软的床","进入梦乡","亡灵返乡",
+    "盖瑞猫咪","半条命3","柔软的床","进入梦乡","睡眠",
     "白色哀悼","遥远的桥","钓鱼人"
 }
 
@@ -43,12 +43,24 @@ local taunts = {
     "看来/victim/需要回新手训练营了！",
     "这一击是专门为/victim/准备的！",
     "连/victimrank/都保护不了你，/victim/！",
-    "作为/rank/，我建议你换个职业！",
     "你这种水平也敢挑战/rank/？",
     "回去练练再来吧，/victim/！",
     "这就是/rank/的实力，/victim/！",
     "今天就让你见识一下什么叫天外有天！",
-    "/victim/，你的技术还停留在上个世纪啊！"
+    "/victim/，你的技术还停留在上个世纪啊！",
+    "一枪秒了，/victim/，有什么好说的？",
+    "最讨厌玩沙盒时找人对战的人了。说的就是你，/victim/！",
+    "该醒了，/victim//victimrank/，该醒了！",
+    "你是在床上拿手柄跟我打的吗，/victim/？",
+    "怎么回事，/victim/？我家的猫都能晋升至/victimrank/。",
+    "哎呀，/victim/，你怎么死啦？",
+    "哦，这不是/victim/本尊吗？",
+    "大家看到我刚才的击杀了吗？真是牛逼！",
+    "看起来你仅仅是嘴上功夫比较厉害，/victim/。",
+    "兄弟，你太菜了，还是回新手村吧！",
+    "哭吧，/victim//victimrank/。",
+    "是啊，下次记得别死，/victim/", 
+    "/rank/爆杀/victimrank/，这把炸鱼局。",
 }
 
 local idles = {
@@ -57,22 +69,43 @@ local idles = {
     "听说/map/这地方闹鬼,有点意思。",
     "我觉得/map/这地方需要整修一下了。",
     "在/map/战斗的感觉真不错！",
-    "在/map/度过的第1天。",
     "不知道/map/的另一边是什么样子？",
     "希望/map/能一直这么混乱。",
     "你知道如何快速升等级吗？/rank/等级太低了！",
     "这里的空气中弥漫着火药味。",
     "我要让/map/响彻/name//rank/的威名！",
     "/map/的每个角落都值得探索。",
-    "不知道/map/今天会发生什么有趣的事。"
+    "不知道/map/今天会发生什么有趣的事。",
+    "/map/这张地图没有CSS也可以玩吗？",
+    "天哪，帧数太低了，/map/都卡成PPT了！",
+    "我们为什么要玩/map/？可以投票换图吗？",
+    "听说有人上传了/map/的重置版本，但被删了。",
+    "啊，Lost media ~ 你知道/map/这张地图曾经失传过一段时间吗？",
+    "我听说/map/这张地图的作者已经80岁了。",
+    "你知道我为什么起/name/这个名字吗？",
+    "最近的创意工坊有什么新东西吗？",
+    "你觉得那些劣质的FNAF存档毁了创意工坊吗？",
+    "伙计们，你们应该看看这个https://www.bilibili.com/video/BV1GJ411x7h7/",
+    "你喜欢我的模型吗？我下载了一个新皮肤！",
+    "能给我做的模组点个赞吗？已经上传创意工坊了。",
+    "我最近在玩一个新游戏，叫《半条命：老鼠》，你们玩过吗？",
+    "我没有买CSS，所以地图里全都是紫黑格，真是服了！",
+    "我想玩那个很火的 VR 模组，可惜我没有 VR 。",
+    "折寿啦！刚刚ARC又发布新的武器包了！",
+    "天哪，这张地图的导航网格太烂了，NPC简直寸步难行！",
+    "是的，但那只是一个游戏理论",
+    "你们在地图中看到过一个称着伞的男人吗？",
+    "我想玩核弹模组了。我想玩核弹 ~ 想玩核弹 ~",
+    "你知道“UC”武器包吗？我喜欢这些武器的手感，打起来很舒服。",
+    "Steam 促销开始了，你们买了什么？",
+    "我是这个服务器的主人！向我鞠躬！"
 }
 
 local levelups = {
     "感觉自己无所不能！",
-    "/rank/还不是我的最终形态！",
-    "继续前进！",
+    "颤抖吧！/rank/还不是我的最终形态！",
+    "继续前进，/name//rank/！",
     "芜湖！/name//rank/来了！",
-    "让对手们颤抖吧！",
     "这份力量,让我感到兴奋！",
     "没想到我还能变得更强！",
     "这就是晋升的感觉吗？",
@@ -83,7 +116,9 @@ local levelups = {
     "现在的我已经今非昔比了！",
     "Gmod 现在太肝了，玩这么久才晋升到/rank/！",
     "终于晋升/rank/了，太棒了！",
-    "这就是/rank/的实力吗？太棒了！"
+    "这就是/rank/的实力吗？太棒了！",
+    "早上起来打到现在，终于晋升/rank/了！",
+    "再晋一级就躺床上睡觉了！",
 }
 
 -- 军衔系统和对应颜色
@@ -200,24 +235,28 @@ if SERVER then
             local attackerData = npcs[attacker:EntIndex()]
             local victimData = npcs[victim:EntIndex()]
             if attackerData and victimData then
-                local message = taunts[math.random(#taunts)]
-                local replacements = {
-                    ["/victim/"] = victimData.name,
-                    ["/victimrank/"] = GetRank(victimData.level),
-                    ["/rank/"] = GetRank(attackerData.level),
-                    ["/name/"] = attackerData.name,
-                    ["/map/"] = game.GetMap()
-                }
-                local formattedMessage = processMessage(message, replacements)
-                local attackerRank = GetRank(attackerData.level)
-                local attackerColor = GetRankColor(attackerData.level)
-                
-                net.Start("NPCTalk_Taunt")
-                net.WriteString(formattedMessage)
-                net.WriteString(attackerRank)
-                net.WriteString(attackerData.name)
-                net.WriteColor(attackerColor)
-                net.Broadcast()
+                timer.Simple(math.random(2, 5), function()
+                    if IsValid(attacker) then
+                        local message = taunts[math.random(#taunts)]
+                        local replacements = {
+                            ["/victim/"] = victimData.name,
+                            ["/victimrank/"] = GetRank(victimData.level),
+                            ["/rank/"] = GetRank(attackerData.level),
+                            ["/name/"] = attackerData.name,
+                            ["/map/"] = game.GetMap()
+                        }
+                        local formattedMessage = processMessage(message, replacements)
+                        local attackerRank = GetRank(attackerData.level)
+                        local attackerColor = GetRankColor(attackerData.level)
+                        
+                        net.Start("NPCTalk_Taunt")
+                        net.WriteString(formattedMessage)
+                        net.WriteString(attackerRank)
+                        net.WriteString(attackerData.name)
+                        net.WriteColor(attackerColor)
+                        net.Broadcast()
+                    end
+                end)
             end
         elseif talkType == "idle" and IsValid(attacker) then
             local npcData = npcs[attacker:EntIndex()]
