@@ -58,6 +58,7 @@ local function SyncNPCData(ent, npcData)
     net.WriteString(npcData.name)
     net.WriteUInt(npcData.level, 8)
     net.WriteUInt(npcData.kills, 8)
+    net.WriteString(npcData.class or "")
     net.Broadcast()
 end
 
@@ -74,6 +75,7 @@ end
 -- 当 NPC 生成时
 hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
     if not IsValid(ent) or not ent:IsNPC() then return end
+    if ent:GetClass() == "npc_bullseye" then return end
     
     timer.Simple(0, function()
         if not IsValid(ent) then return end
@@ -81,7 +83,8 @@ hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
         local npcData = {
             name = npcNames[math.random(#npcNames)],
             level = 1,
-            kills = 0
+            kills = 0,
+            class = ent:GetName() or ent:GetClass()
         }
         
         npcs[ent:EntIndex()] = npcData
@@ -101,7 +104,8 @@ if CLIENT then
         npcs[ent:EntIndex()] = {
             name = net.ReadString(),
             level = net.ReadUInt(8),
-            kills = net.ReadUInt(8)
+            kills = net.ReadUInt(8),
+            class = net.ReadString()
         }
     end)
 
@@ -118,6 +122,7 @@ if SERVER then -- 只在服务器端处理击杀事件
         -- 检查双方是否都是有效的NPC
         if not IsValid(npc) or not IsValid(attacker) then return end
         if not npc:IsNPC() or not attacker:IsNPC() then return end
+        if attacker:GetClass() == "npc_bullseye" or npc:GetClass() == "npc_bullseye" then return end
         
         local attackerIndex = attacker:EntIndex()
         local npcData = npcs[attackerIndex]
@@ -127,20 +132,24 @@ if SERVER then -- 只在服务器端处理击杀事件
         local victimData = npcs[npc:EntIndex()]
         local victimName = victimData and victimData.name or "未知敌人"
         local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
+        local victimClass = victimData and victimData.class or (npc:GetName() or npc:GetClass())
+        local attackerClass = npcData.class or (attacker:GetName() or attacker:GetClass())
         
         npcData.kills = npcData.kills + 1
         npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message = string.format("%s %s击败了%s %s！", rank, npcData.name, victimRank, victimName)
+        local message = string.format("%s %s[%s]击败了%s %s[%s]！", 
+            rank, npcData.name, attackerClass, victimRank, victimName, victimClass)
         BroadcastMessage(message, rankColor)
         
         SyncNPCData(attacker, npcData)
             
         if npcData.kills % 2 == 0 and npcData.level < 15 then
             local newRank = GetRank(npcData.level)
-            BroadcastMessage(string.format("%s晋升为%s！", npcData.name, newRank), rankColor)
+            BroadcastMessage(string.format("%s[%s]晋升为%s！", 
+                npcData.name, attackerClass, newRank), rankColor)
         end
         
         -- 延迟清理被击杀NPC的数据
@@ -168,6 +177,7 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     
     local tr = ply:GetEyeTrace()
     if not IsValid(tr.Entity) or not tr.Entity:IsNPC() then return end
+    if tr.Entity:GetClass() == "npc_bullseye" then return end
     
     local npcData = npcs[tr.Entity:EntIndex()]
     if not npcData then return end
@@ -176,7 +186,7 @@ hook.Add("HUDPaint", "DisplayNPCInfo", function()
     local rankColor = GetRankColor(npcData.level)
     local sw, sh = ScrW(), ScrH()
     
-    local text = string.format("%s %s", rank, npcData.name)
+    local text = string.format("%s %s[%s]", rank, npcData.name, npcData.class)
     local x, y = sw / 2, sh / 1.87
     local font = "DermaLarge"
     
