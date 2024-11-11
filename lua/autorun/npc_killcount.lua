@@ -79,10 +79,10 @@ if SERVER then
     end
 
     -- 发送聊天消息的函数
-    local function BroadcastMessage(message, color)
+    local function BroadcastMessage(messageType, data)
         net.Start("BroadcastMessage")
-        net.WriteString(message)
-        net.WriteTable(color or Color(255, 255, 255))
+        net.WriteUInt(messageType, 4) -- 消息类型
+        net.WriteTable(data)
         net.Broadcast()
     end
 
@@ -157,8 +157,13 @@ if SERVER then
             
             local newRank = GetRank(npcData.level)
             local rankColor = GetRankColor(npcData.level)
-            BroadcastMessage(string.format("%s 晋升为 %s！", 
-                npcData.name, newRank), rankColor)
+            
+            -- 发送升级消息
+            BroadcastMessage(1, {
+                name = npcData.name,
+                rank = newRank,
+                color = rankColor
+            })
                 
             requiredExp = GetRequiredExp(npcData.level)
         end
@@ -171,21 +176,25 @@ if SERVER then
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
         
-        -- 根据是否误杀显示不同消息
-        local message
+        -- 发送击杀消息
         if isFriendlyFire then
-            message = string.format("友军伤害！%s %s 误杀了同伴 %s %s，损失 %d 经验！", 
-                rank, npcData.name, victimRank, victimName, math.abs(expGain))
-            BroadcastMessage(message, Color(255, 0, 0)) -- 误杀使用红色显示
+            BroadcastMessage(2, {
+                rank = rank,
+                name = npcData.name,
+                victimRank = victimRank,
+                victimName = victimName,
+                expGain = math.abs(expGain)
+            })
         else
-            if npcData.level >= 15 then
-                message = string.format("%s %s 击败了 %s %s", 
-                    rank, npcData.name, victimRank, victimName)
-            else
-                message = string.format("%s %s 击败了 %s %s，获得 %d 经验！", 
-                    rank, npcData.name, victimRank, victimName, expGain)
-            end
-            BroadcastMessage(message, rankColor)
+            BroadcastMessage(3, {
+                rank = rank,
+                name = npcData.name,
+                victimRank = victimRank,
+                victimName = victimName,
+                expGain = expGain,
+                level = npcData.level,
+                color = rankColor
+            })
         end
         
         SyncNPCData(attacker, npcData)
@@ -238,9 +247,24 @@ if CLIENT then
 
     -- 接收聊天消息
     net.Receive("BroadcastMessage", function()
-        local message = net.ReadString()
-        local color = net.ReadTable()
-        chat.AddText(color, message)
+        local messageType = net.ReadUInt(4)
+        local data = net.ReadTable()
+        
+        if messageType == 1 then -- 升级消息
+            chat.AddText(data.color, string.format("%s 晋升为 %s！", 
+                data.name, data.rank))
+        elseif messageType == 2 then -- 误杀消息
+            chat.AddText(Color(255, 0, 0), string.format("友军伤害！%s %s 误杀了同伴 %s %s，损失 %d 经验！",
+                data.rank, data.name, data.victimRank, data.victimName, data.expGain))
+        elseif messageType == 3 then -- 击杀消息
+            if data.level >= 15 then
+                chat.AddText(data.color, string.format("%s %s 击败了 %s %s",
+                    data.rank, data.name, data.victimRank, data.victimName))
+            else
+                chat.AddText(data.color, string.format("%s %s 击败了 %s %s，获得 %d 经验！",
+                    data.rank, data.name, data.victimRank, data.victimName, data.expGain))
+            end
+        end
     end)
 
     -- 显示 NPC 信息
