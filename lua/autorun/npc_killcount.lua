@@ -138,6 +138,21 @@ end
 
 -- 客户端代码
 if CLIENT then
+
+    local xx,yy=ScrW()/1920,ScrH()/1080     --玩家屏幕分辨率与我的屏幕分辨率的比
+
+    surface.CreateFont("ofkctextlarge", {
+        font = "HONOR Sans CN Heavy",
+        extended = true ,
+        size = 35*yy
+    })
+    
+    surface.CreateFont("ofkctext", {
+        font = "HONOR Sans CN",
+        extended = true ,
+        size = 20*yy
+    })
+
     -- 接收 NPC 数据
     net.Receive("SyncNPCData", function()
         local ent = net.ReadEntity()
@@ -176,7 +191,6 @@ if CLIENT then
         
         local text = string.format("%s %s[%s]", rank, npcData.name, npcData.class)
         local x, y = sw / 2, sh / 1.87
-        local font = "DermaLarge"
         
         local r, g, b = rankColor.r, rankColor.g, rankColor.b
         local brightness = (r * 299 + g * 587 + b * 114) / 1000
@@ -184,20 +198,20 @@ if CLIENT then
         if brightness < 128 then
             for dx = -2, 2 do
                 for dy = -2, 2 do
-                    draw.SimpleText(text, font, x + dx, y + dy, Color(255, 255, 255, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.SimpleText(text, "ofkctextlarge", x + dx, y + dy, Color(255, 255, 255, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
             end
         else
             for dx = -2, 2 do
                 for dy = -2, 2 do
-                    draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.SimpleText(text, "ofkctextlarge", x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
             end
         end
         
-        draw.SimpleText(text, font, x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        draw.SimpleText(text, "ofkctextlarge", x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         
         local infoText = string.format("等级: %d | 击杀: %d", npcData.level, npcData.kills)
-        draw.SimpleText(infoText, "DermaDefault", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        draw.SimpleText(infoText, "ofkctext", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end)
 end
