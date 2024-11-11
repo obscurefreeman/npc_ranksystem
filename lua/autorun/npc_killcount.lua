@@ -62,7 +62,7 @@ local levelups = {
     "没想到我还能变得更强！",
     "这就是晋升的感觉吗？",
     "我现在就像开了挂一样强！",
-    "我也当上/rank/了！",
+    "我/name/也当上/rank/了！",
 }
 
 -- 军衔系统和对应颜色
@@ -182,6 +182,9 @@ if SERVER then
                 local message = taunts[math.random(#taunts)]
                 local replacements = {
                     ["/victim/"] = victimData.name,
+                    ["/victimrank/"] = GetRank(victimData.level),
+                    ["/rank/"] = GetRank(attackerData.level),
+                    ["/name/"] = attackerData.name,
                     ["/map/"] = game.GetMap()
                 }
                 local formattedMessage = processMessage(message, replacements)
@@ -200,6 +203,8 @@ if SERVER then
             if npcData then
                 local message = idles[math.random(#idles)]
                 local replacements = {
+                    ["/rank/"] = GetRank(npcData.level),
+                    ["/name/"] = npcData.name,
                     ["/map/"] = game.GetMap()
                 }
                 local formattedMessage = processMessage(message, replacements)
@@ -218,6 +223,8 @@ if SERVER then
             if npcData then
                 local message = levelups[math.random(#levelups)]
                 local replacements = {
+                    ["/rank/"] = GetRank(npcData.level),
+                    ["/name/"] = npcData.name,
                     ["/map/"] = game.GetMap()
                 }
                 local formattedMessage = processMessage(message, replacements)
@@ -472,7 +479,6 @@ if CLIENT then
         extended = true ,
         size = 20*yy
     })
-
     surface.CreateFont("ofkctextlarge3d", {
         font = "HONOR Sans CN Heavy",
         extended = true,
