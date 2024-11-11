@@ -68,6 +68,10 @@ if SERVER then
     util.AddNetworkString("BroadcastMessage")
     util.AddNetworkString("NPCLevelUpEffect")
 
+    -- 创建ConVar
+    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "0", FCVAR_ARCHIVE, "设置NPC是否随机等级 (0=从1级开始, 1=随机等级)")
+    local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
+
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
         net.Start("SyncNPCData")
@@ -96,9 +100,14 @@ if SERVER then
         timer.Simple(0, function()
             if not IsValid(ent) then return end
             
+            local initialLevel = 1
+            if npc_random_level:GetBool() then
+                initialLevel = math.random(1, 15)
+            end
+            
             local npcData = {
                 name = npcNames[math.random(#npcNames)],
-                level = 1,
+                level = initialLevel,
                 kills = 0,
                 exp = 0,
                 class = ent:GetClass()
@@ -255,9 +264,6 @@ if CLIENT then
         size = 60
     })
 
-    -- 创建ConVar
-    local npc_text_mode = CreateConVar("npc_text_mode", "0", FCVAR_ARCHIVE, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
-
     -- 存储NPC升级特效数据
     local levelUpEffects = {}
 
@@ -361,7 +367,7 @@ if CLIENT then
         if not npcData then return end
 
         -- 如果npc_text_mode为1，则不在HUD上显示
-        if npc_text_mode:GetInt() == 1 then return end
+        if GetConVar("ofkc_npc_text_mode"):GetInt() == 1 then return end
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
@@ -403,7 +409,7 @@ if CLIENT then
 
     -- 在NPC头顶显示信息
     hook.Add("PostDrawTranslucentRenderables", "DrawNPCOverheadInfo", function()
-        if npc_text_mode:GetInt() ~= 1 then return end
+        if GetConVar("ofkc_npc_text_mode"):GetInt() ~= 1 then return end
 
         local ply = LocalPlayer()
         if not IsValid(ply) then return end
@@ -444,9 +450,9 @@ if CLIENT then
                 end
 
                 -- 绘制信息文字阴影
-                draw.SimpleText(infoText, "ofkctext3d", 2, 62, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                draw.SimpleText(infoText, "ofkctext3d", 2, 72, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 -- 绘制信息主文字
-                draw.SimpleText(infoText, "ofkctext3d", 0, 60, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                draw.SimpleText(infoText, "ofkctext3d", 0, 70, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             cam.End3D2D()
         end
     end)
