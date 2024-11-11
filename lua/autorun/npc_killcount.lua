@@ -50,13 +50,26 @@ end
 local function GetRequiredExp(level)
     if level >= 15 then
         return 0
-    elseif level <= 5 then
-        return 100
-    elseif level <= 10 then
-        return 120
-    else
-        return 150
     end
+    
+    local expTable = {
+        [1] = 120,
+        [2] = 140,
+        [3] = 160,
+        [4] = 180,
+        [5] = 200,
+        [6] = 240,
+        [7] = 280,
+        [8] = 320,
+        [9] = 360,
+        [10] = 400,
+        [11] = 460,
+        [12] = 520,
+        [13] = 580,
+        [14] = 640
+    }
+    
+    return expTable[level] or 0
 end
 
 -- NPC 数据存储
