@@ -65,6 +65,7 @@ local npcs = {}
 if SERVER then
     util.AddNetworkString("SyncNPCData")
     util.AddNetworkString("BroadcastMessage")
+    util.AddNetworkString("NPCLevelUpEffect")
 
     -- 同步 NPC 数据到客户端的函数
     local function SyncNPCData(ent, npcData)
@@ -159,12 +160,18 @@ if SERVER then
             local newRank = GetRank(npcData.level)
             local rankColor = GetRankColor(npcData.level)
             
-            -- 发送升级消息
+            -- 发送升级消息和特效
             BroadcastMessage(1, {
                 name = npcData.name,
                 rank = newRank,
                 color = rankColor
             })
+            
+            -- 发送升级特效
+            net.Start("NPCLevelUpEffect")
+            net.WriteEntity(attacker)
+            net.WriteColor(rankColor)
+            net.Broadcast()
                 
             requiredExp = GetRequiredExp(npcData.level)
         end
@@ -234,6 +241,50 @@ if CLIENT then
         extended = true ,
         size = 20*yy
     })
+
+    -- 存储NPC升级特效数据
+    local levelUpEffects = {}
+
+    -- 接收升级特效
+    net.Receive("NPCLevelUpEffect", function()
+        local npc = net.ReadEntity()
+        local color = net.ReadColor()
+        
+        if IsValid(npc) then
+            levelUpEffects[npc] = {
+                color = color,
+                startTime = CurTime(),
+                duration = 1 -- 持续1秒
+            }
+        end
+    end)
+
+    -- 渲染NPC升级特效
+    hook.Add("PostDrawOpaqueRenderables", "RenderNPCLevelUpEffect", function()
+        for npc, effectData in pairs(levelUpEffects) do
+            if IsValid(npc) then
+                local timeElapsed = CurTime() - effectData.startTime
+                if timeElapsed <= effectData.duration then
+                    local alpha = 255 * (1 - timeElapsed / effectData.duration)
+                    
+                    cam.Start3D()
+                        render.SetColorModulation(effectData.color.r/255, effectData.color.g/255, effectData.color.b/255)
+                        render.SuppressEngineLighting(true)
+                        render.MaterialOverride(Material("models/debug/debugwhite"))
+                        render.SetBlend(alpha/255)
+                        npc:DrawModel()
+                        render.MaterialOverride()
+                        render.SuppressEngineLighting(false)
+                        render.SetBlend(1)
+                    cam.End3D()
+                else
+                    levelUpEffects[npc] = nil
+                end
+            else
+                levelUpEffects[npc] = nil
+            end
+        end
+    end)
 
     -- 接收 NPC 数据
     net.Receive("SyncNPCData", function()
