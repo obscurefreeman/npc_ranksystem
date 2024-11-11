@@ -81,7 +81,6 @@ if SERVER then
                 level = 1,
                 kills = 0,
                 class = ent:GetClass()
-                classname = self:GetDeathNoticeEntityName( Class )
             }
             
             npcs[ent:EntIndex()] = npcData
