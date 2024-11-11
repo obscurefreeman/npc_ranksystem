@@ -1,15 +1,20 @@
 -- NPC 名字池
 local npcNames = {
-    "约翰逊", "威廉姆斯", "史密斯",
-    "安德森", "布朗", "米勒",
+    "约翰逊","杨", "金",
+    "米勒","沃克", "霍尔",
     "威尔逊", "泰勒", "托马斯",
-    "杰克逊", "怀特", "哈里斯",
-    "马丁", "汤普森", "加西亚",
-    "马丁内斯", "罗宾逊", "克拉克",
-    "罗德里格斯", "路易斯", "李",
-    "沃克", "霍尔", "艾伦",
-    "杨", "埃尔南德斯", "金",
-    "赖特", "洛佩兹", "希尔"
+    "杰克逊", "汤普森", "加西亚",
+    "马丁内斯", "罗宾逊", "弗兰克",
+    "罗德里格斯", "路易吉", "李",
+    "赖特", "洛佩兹", "希尔",
+    "尤里","伊万诺夫","戈尔巴乔夫","朱可夫",
+    "薄荷","迷迭香","鱼腥草",
+    "百里香","鼠尾草","薰衣草",
+    "芫荽","骇人鲨鱼","河豚",
+    "探戈","猎狐者","狐狸",
+    "无名","赭石","睡衣派对",
+    "圣诞老人","邪恶降临","一只巴尼",
+    "拍肉","半条命3","柔软的床","美妙的梦"
 }
 
 -- 军衔系统和对应颜色
@@ -109,16 +114,16 @@ if SERVER then
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
-        local message = string.format("%s %s[%s]击败了%s %s[%s]！", 
-            rank, npcData.name, attackerClass, victimRank, victimName, victimClass)
+        local message = string.format("%s %s 击败了 %s %s！", 
+            rank, npcData.name, victimRank, victimName)
         BroadcastMessage(message, rankColor)
         
         SyncNPCData(attacker, npcData)
             
         if npcData.kills % 2 == 0 and npcData.level < 15 then
             local newRank = GetRank(npcData.level)
-            BroadcastMessage(string.format("%s[%s]晋升为%s！", 
-                npcData.name, attackerClass, newRank), rankColor)
+            BroadcastMessage(string.format("%s 晋升为 %s！", 
+                npcData.name, newRank), rankColor)
         end
         
         timer.Simple(0.1, function()
@@ -182,6 +187,10 @@ if CLIENT then
         if not IsValid(tr.Entity) or not tr.Entity:IsNPC() then return end
         if tr.Entity:GetClass() == "npc_bullseye" then return end
         
+        -- 检查距离,超过1000单位不显示
+        local distance = ply:GetPos():Distance(tr.Entity:GetPos())
+        if distance > 1000 then return end
+        
         local npcData = npcs[tr.Entity:EntIndex()]
         if not npcData then return end
         
@@ -189,7 +198,7 @@ if CLIENT then
         local rankColor = GetRankColor(npcData.level)
         local sw, sh = ScrW(), ScrH()
         
-        local text = string.format("%s %s[%s]", rank, npcData.name, npcData.class)
+        local text = string.format("%s %s ", rank, npcData.name)
         local x, y = sw / 2, sh / 1.87
         
         local r, g, b = rankColor.r, rankColor.g, rankColor.b
