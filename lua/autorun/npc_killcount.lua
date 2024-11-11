@@ -12,9 +12,10 @@ local npcNames = {
     "百里香","鼠尾草","薰衣草",
     "芫荽","骇人鲨鱼","河豚",
     "探戈","猎狐者","狐狸",
-    "无名","赭石","睡衣派对",
+    "无名氏","赭石","睡衣派对",
     "圣诞老人","邪恶降临","一只巴尼",
-    "拍肉","半条命3","柔软的床","美妙的梦","铁轨英雄"
+    "拍肉","半条命3","柔软的床","美妙的梦","铁轨英雄",
+    "白色哀悼","遥远的桥"
 }
 
 -- 军衔系统和对应颜色
@@ -242,6 +243,21 @@ if CLIENT then
         size = 20*yy
     })
 
+    surface.CreateFont("ofkctextlarge3d", {
+        font = "HONOR Sans CN Heavy",
+        extended = true,
+        size = 100
+    })
+
+    surface.CreateFont("ofkctext3d", {
+        font = "HONOR Sans CN",
+        extended = true,
+        size = 60
+    })
+
+    -- 创建ConVar
+    local npc_text_mode = CreateConVar("npc_text_mode", "0", FCVAR_ARCHIVE, "设置NPC文字显示模式 (0=屏幕中心, 1=NPC头顶)")
+
     -- 存储NPC升级特效数据
     local levelUpEffects = {}
 
@@ -343,6 +359,9 @@ if CLIENT then
         
         local npcData = npcs[tr.Entity:EntIndex()]
         if not npcData then return end
+
+        -- 如果npc_text_mode为1，则不在HUD上显示
+        if npc_text_mode:GetInt() == 1 then return end
         
         local rank = GetRank(npcData.level)
         local rankColor = GetRankColor(npcData.level)
@@ -380,5 +399,55 @@ if CLIENT then
                 npcData.level, npcData.kills, npcData.exp, requiredExp)
         end
         draw.SimpleText(infoText, "ofkctext", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    end)
+
+    -- 在NPC头顶显示信息
+    hook.Add("PostDrawTranslucentRenderables", "DrawNPCOverheadInfo", function()
+        if npc_text_mode:GetInt() ~= 1 then return end
+
+        local ply = LocalPlayer()
+        if not IsValid(ply) then return end
+
+        for _, ent in ipairs(ents.FindByClass("npc_*")) do
+            if not IsValid(ent) or ent:GetClass() == "npc_bullseye" then continue end
+
+            local distance = ply:GetPos():Distance(ent:GetPos())
+            if distance > 500 then continue end
+
+            local npcData = npcs[ent:EntIndex()]
+            if not npcData then continue end
+
+            local pos = ent:GetPos() + Vector(0, 0, ent:OBBMaxs().z + 10)
+            local ang = Angle(0, ply:EyeAngles().y - 90, 90)
+
+            -- 修改缩放计算方式,使用平方根函数使缩放变化更平缓
+            local scale = math.Clamp(math.sqrt(1 - (distance / 1000)), 0.1, 1)
+
+            cam.Start3D2D(pos, ang, 0.1 * scale)
+                local rank = GetRank(npcData.level)
+                local rankColor = GetRankColor(npcData.level)
+                local text = string.format("%s %s", rank, npcData.name)
+
+                -- 绘制文字阴影
+                draw.SimpleText(text, "ofkctextlarge3d", 2, 2, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                -- 绘制主文字
+                draw.SimpleText(text, "ofkctextlarge3d", 0, 0, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+                local infoText
+                if npcData.level >= 15 then
+                    infoText = string.format("等级: %d | 击杀: %d | 经验: 满级", 
+                        npcData.level, npcData.kills)
+                else
+                    local requiredExp = GetRequiredExp(npcData.level)
+                    infoText = string.format("等级: %d | 击杀: %d | 经验: %d/%d", 
+                        npcData.level, npcData.kills, npcData.exp, requiredExp)
+                end
+
+                -- 绘制信息文字阴影
+                draw.SimpleText(infoText, "ofkctext3d", 2, 62, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                -- 绘制信息主文字
+                draw.SimpleText(infoText, "ofkctext3d", 0, 60, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+            cam.End3D2D()
+        end
     end)
 end
