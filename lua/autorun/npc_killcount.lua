@@ -44,82 +44,53 @@ end
 -- NPC 数据存储
 local npcs = {}
 
--- 网络通信相关
+-- 服务器端代码
 if SERVER then
     util.AddNetworkString("SyncNPCData")
     util.AddNetworkString("BroadcastMessage")
-end
 
--- 同步 NPC 数据到客户端的函数
-local function SyncNPCData(ent, npcData)
-    if not SERVER then return end
-    net.Start("SyncNPCData")
-    net.WriteEntity(ent)
-    net.WriteString(npcData.name)
-    net.WriteUInt(npcData.level, 8)
-    net.WriteUInt(npcData.kills, 8)
-    net.WriteString(npcData.class or "")
-    net.Broadcast()
-end
+    -- 同步 NPC 数据到客户端的函数
+    local function SyncNPCData(ent, npcData)
+        net.Start("SyncNPCData")
+        net.WriteEntity(ent)
+        net.WriteString(npcData.name)
+        net.WriteUInt(npcData.level, 8)
+        net.WriteUInt(npcData.kills, 8)
+        net.WriteString(npcData.class or "")
+        net.Broadcast()
+    end
 
--- 发送聊天消息的函数
-local function BroadcastMessage(message, color)
-    if SERVER then
+    -- 发送聊天消息的函数
+    local function BroadcastMessage(message, color)
         net.Start("BroadcastMessage")
         net.WriteString(message)
         net.WriteTable(color or Color(255, 255, 255))
         net.Broadcast()
     end
-end
 
--- 当 NPC 生成时
-hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
-    if not IsValid(ent) or not ent:IsNPC() then return end
-    if ent:GetClass() == "npc_bullseye" then return end
-    
-    timer.Simple(0, function()
-        if not IsValid(ent) then return end
+    -- 当 NPC 生成时
+    hook.Add("OnEntityCreated", "NPCLevelSystem", function(ent)
+        if not IsValid(ent) or not ent:IsNPC() then return end
+        if ent:GetClass() == "npc_bullseye" then return end
         
-        local npcData = {
-            name = npcNames[math.random(#npcNames)],
-            level = 1,
-            kills = 0,
-            class = ent:GetName() or ent:GetClass()
-        }
-        
-        npcs[ent:EntIndex()] = npcData
-        
-        if SERVER then
+        timer.Simple(0, function()
+            if not IsValid(ent) then return end
+            
+            local npcData = {
+                name = npcNames[math.random(#npcNames)],
+                level = 1,
+                kills = 0,
+                class = ent:GetClass()
+                classname = self:GetDeathNoticeEntityName( Class )
+            }
+            
+            npcs[ent:EntIndex()] = npcData
             SyncNPCData(ent, npcData)
-        end
-    end)
-end)
-
--- 在客户端接收数据
-if CLIENT then
-    net.Receive("SyncNPCData", function()
-        local ent = net.ReadEntity()
-        if not IsValid(ent) then return end
-        
-        npcs[ent:EntIndex()] = {
-            name = net.ReadString(),
-            level = net.ReadUInt(8),
-            kills = net.ReadUInt(8),
-            class = net.ReadString()
-        }
+        end)
     end)
 
-    net.Receive("BroadcastMessage", function()
-        local message = net.ReadString()
-        local color = net.ReadTable()
-        chat.AddText(color, message)
-    end)
-end
-
--- 当 NPC 击杀其他 NPC 时
-if SERVER then -- 只在服务器端处理击杀事件
+    -- 当 NPC 击杀其他 NPC 时
     hook.Add("OnNPCKilled", "NPCLevelUp", function(npc, attacker, inflictor)
-        -- 检查双方是否都是有效的NPC
         if not IsValid(npc) or not IsValid(attacker) then return end
         if not npc:IsNPC() or not attacker:IsNPC() then return end
         if attacker:GetClass() == "npc_bullseye" or npc:GetClass() == "npc_bullseye" then return end
@@ -128,12 +99,11 @@ if SERVER then -- 只在服务器端处理击杀事件
         local npcData = npcs[attackerIndex]
         if not npcData then return end
         
-        -- 获取被击杀者的数据
         local victimData = npcs[npc:EntIndex()]
         local victimName = victimData and victimData.name or "未知敌人"
         local victimRank = victimData and GetRank(victimData.level) or "未知军衔"
-        local victimClass = victimData and victimData.class or (npc:GetName() or npc:GetClass())
-        local attackerClass = npcData.class or (attacker:GetName() or attacker:GetClass())
+        local victimClass = victimData and victimData.class
+        local attackerClass = npcData.class
         
         npcData.kills = npcData.kills + 1
         npcData.level = math.min(math.floor(npcData.kills / 2) + 1, 15)
@@ -152,68 +122,83 @@ if SERVER then -- 只在服务器端处理击杀事件
                 npcData.name, attackerClass, newRank), rankColor)
         end
         
-        -- 延迟清理被击杀NPC的数据
         timer.Simple(0.1, function()
             npcs[npc:EntIndex()] = nil
         end)
     end)
+
+    -- 当 NPC 被移除时清理数据
+    hook.Add("EntityRemoved", "CleanupNPCData", function(ent)
+        if IsValid(ent) and ent:IsNPC() then
+            if ent:Health() > 0 then
+                npcs[ent:EntIndex()] = nil
+            end
+        end
+    end)
 end
 
--- 当 NPC 被移除时清理数据
-hook.Add("EntityRemoved", "CleanupNPCData", function(ent)
-    if IsValid(ent) and ent:IsNPC() then
-        -- 如果这个NPC是被击杀的,数据会在OnNPCKilled中延迟清理
-        -- 这里只处理其他情况下的NPC移除(比如被移除工具移除)
-        if ent:Health() > 0 then
-            npcs[ent:EntIndex()] = nil
-        end
-    end
-end)
+-- 客户端代码
+if CLIENT then
+    -- 接收 NPC 数据
+    net.Receive("SyncNPCData", function()
+        local ent = net.ReadEntity()
+        if not IsValid(ent) then return end
+        
+        npcs[ent:EntIndex()] = {
+            name = net.ReadString(),
+            level = net.ReadUInt(8),
+            kills = net.ReadUInt(8),
+            class = net.ReadString()
+        }
+    end)
 
--- 显示 NPC 信息
-hook.Add("HUDPaint", "DisplayNPCInfo", function()
-    local ply = LocalPlayer()
-    if not IsValid(ply) then return end
-    
-    local tr = ply:GetEyeTrace()
-    if not IsValid(tr.Entity) or not tr.Entity:IsNPC() then return end
-    if tr.Entity:GetClass() == "npc_bullseye" then return end
-    
-    local npcData = npcs[tr.Entity:EntIndex()]
-    if not npcData then return end
-    
-    local rank = GetRank(npcData.level)
-    local rankColor = GetRankColor(npcData.level)
-    local sw, sh = ScrW(), ScrH()
-    
-    local text = string.format("%s %s[%s]", rank, npcData.name, npcData.class)
-    local x, y = sw / 2, sh / 1.87
-    local font = "DermaLarge"
-    
-    -- 判断颜色深浅
-    local r, g, b = rankColor.r, rankColor.g, rankColor.b
-    local brightness = (r * 299 + g * 587 + b * 114) / 1000
-    
-    -- 如果颜色较深，使用白色描边
-    if brightness < 128 then
-        for dx = -2, 2 do
-            for dy = -2, 2 do
-                draw.SimpleText(text, font, x + dx, y + dy, Color(255, 255, 255, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    -- 接收聊天消息
+    net.Receive("BroadcastMessage", function()
+        local message = net.ReadString()
+        local color = net.ReadTable()
+        chat.AddText(color, message)
+    end)
+
+    -- 显示 NPC 信息
+    hook.Add("HUDPaint", "DisplayNPCInfo", function()
+        local ply = LocalPlayer()
+        if not IsValid(ply) then return end
+        
+        local tr = ply:GetEyeTrace()
+        if not IsValid(tr.Entity) or not tr.Entity:IsNPC() then return end
+        if tr.Entity:GetClass() == "npc_bullseye" then return end
+        
+        local npcData = npcs[tr.Entity:EntIndex()]
+        if not npcData then return end
+        
+        local rank = GetRank(npcData.level)
+        local rankColor = GetRankColor(npcData.level)
+        local sw, sh = ScrW(), ScrH()
+        
+        local text = string.format("%s %s[%s]", rank, npcData.name, npcData.class)
+        local x, y = sw / 2, sh / 1.87
+        local font = "DermaLarge"
+        
+        local r, g, b = rankColor.r, rankColor.g, rankColor.b
+        local brightness = (r * 299 + g * 587 + b * 114) / 1000
+        
+        if brightness < 128 then
+            for dx = -2, 2 do
+                for dy = -2, 2 do
+                    draw.SimpleText(text, font, x + dx, y + dy, Color(255, 255, 255, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                end
+            end
+        else
+            for dx = -2, 2 do
+                for dy = -2, 2 do
+                    draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                end
             end
         end
-    else
-        -- 如果颜色较浅，使用黑色描边
-        for dx = -2, 2 do
-            for dy = -2, 2 do
-                draw.SimpleText(text, font, x + dx, y + dy, Color(0, 0, 0, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-            end
-        end
-    end
-    
-    -- 绘制主文本
-    draw.SimpleText(text, font, x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-    
-    -- 添加等级和击杀信息
-    local infoText = string.format("等级: %d | 击杀: %d", npcData.level, npcData.kills)
-    draw.SimpleText(infoText, "DermaDefault", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-end)
+        
+        draw.SimpleText(text, font, x, y, rankColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+        
+        local infoText = string.format("等级: %d | 击杀: %d", npcData.level, npcData.kills)
+        draw.SimpleText(infoText, "DermaDefault", x, y + 30, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+    end)
+end
