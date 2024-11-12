@@ -22,8 +22,8 @@ local npcNames = {
     "圣诞老人","邪恶降临","一只巴尼",
     "盖瑞猫咪","半条命3","柔软的床",
     "白色哀悼","钓鱼人","该名称已被占用",
-    "网抑云用户","键盘侠","萌新求带","冒险家",
-    "在线摸鱼","吃瓜群众","我不是挂"
+    "键盘侠","萌新求带","冒险家",
+    "在线摸鱼","我不是挂"
     },
     ["en"] = {
     "Johnson", "Yang", "Jin",
@@ -45,26 +45,26 @@ local npcNames = {
     "Anonymous", "Ochre", "Pajama-party",
     "Santa", "Aarney",
     "Garry's Cat", "Half-Life 3",
-    "White-mourning", "Fisherman", "Name-already-taken"
+    "White mourning", "Fisherman", "Name already taken"
     }
 }
 
 -- 对话池
 local taunts = {
     ["zh-CN"] = {
-    "/victim/,你的战斗技巧还需要提高！",
+    "/victim/，你的战斗技巧还需要提高！",
     "看来/victim/今天状态不太好啊~",
-    "抱歉了/victim/,这就是实力的差距！", 
-    "下次记得带上脑子再来,/victim/！",
-    "这就是你的全部实力吗,/victim/？",
-    "再见了/victim/,安息吧！",
-    "在这个美好的日子里送你上路,/victim/！",
-    "让你见识一下什么叫真正的实力,/victim/！",
-    "你太弱了/victim/,连热身都算不上！",
-    "哈哈，/victim/,下辈子你可要当心啊！",
+    "抱歉了/victim/，这就是实力的差距！", 
+    "下次记得带上脑子再来，/victim/！",
+    "这就是你的全部实力吗，/victim/？",
+    "再见了/victim/，安息吧！",
+    "在这个美好的日子里送你上路，/victim/！",
+    "让你见识一下什么叫真正的实力，/victim/！",
+    "你太弱了/victim/，连热身都算不上！",
+    "哈哈，/victim/，下辈子你可要当心啊！",
     "/victim/，你是怎么晋升到/victimrank/的？",
-    "你的等级很高,可惜你遇上了我！",
-    "你已经死了,我的朋友！",
+    "你的等级很高，可惜你遇上了我！",
+    "你已经死了，我的朋友！",
     "按“F”键向/victim//victimrank/致敬！",
     "/victim//victimrank/？可惜你现在是/victim/“布娃娃”！",
     "你现在就像个布娃娃一样弱！",
@@ -97,7 +97,7 @@ local taunts = {
     "我从三岁就开始玩这个游戏了，/victim//victimrank/。",
     "这么菜也配在/map/挑战我一个等级为/rank/的人？",
     "不是/victim/你行不行啊？我还没发挥实力呢！",
-    "/map/又多了一具尸体，一路顺风,/victim/。",
+    "/map/又多了一具尸体，一路顺风，/victim/。",
     },
     ["en"] = {
     "/victim/, your combat skills need improvement!",
@@ -118,7 +118,7 @@ local taunts = {
     "You're as weak as a ragdoll now!",
     "I'm a /rank/, who do you think you are?",
     "I won't go easy on you, /victimrank/ /victim/!",
-    "A noob like you dares to challenge /name/ /rank/?",
+    "A noob like you dares to challenge /rank/ /name/?",
     "As a /rank/, it's my duty to teach rookies like you!",
     "Are you familiar with /map/? /victim/, this is how pros understand the map!",
     "Looks like /victim/ needs to go back to training camp!",
@@ -149,12 +149,12 @@ local taunts = {
 local idles = {
     ["zh-CN"] = {
     "/map/真是个不错的战场！",
-    "今天天气不错,适合在/map/散散心。",
-    "听说/map/这地方闹鬼,有点意思。",
+    "今天天气不错，适合在/map/散散心。",
+    "听说/map/这地方闹鬼，有点意思。",
     "我觉得/map/这地方需要整修一下了。",
     "在/map/战斗的感觉真不错！",
     "不知道/map/的另一边是什么样子？",
-    "希望/map/能一直这么混乱。",
+    "希望/map/能一直这么热闹。",
     "你知道如何快速升等级吗？/rank/等级太低了！",
     "这里的空气中弥漫着火药味。",
     "我要让/map/响彻/name//rank/的威名！",
@@ -187,6 +187,8 @@ local idles = {
     "我是这个服务器的主人！向我鞠躬！",
     "这个游戏看起来糟糕透了，Gmod的黄金时代已经过去了。",
     "房主能放一些音乐吗？",
+    "180.100.47.6 这是你的IP地址吗？我可是一个黑客哦！",
+    "我已经 76 岁了，但我还是每天启动Gmod。",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -198,10 +200,10 @@ local idles = {
     "Hope /map/ stays this chaotic.",
     "Do you know how to level up quickly? /rank/ level is too low!",
     "The air here smells of gunpowder.",
-    "I'll make /map/ echo with the fame of /name/ /rank/!",
+    "I'll make /map/ echo with the fame of /rank/ /name/!",
     "Every corner of /map/ is worth exploring.",
     "Wonder what interesting things will happen in /map/ today.",
-    "Can you play this /map/ without CSS?",
+    "Can you play /map/ without CSS?",
     "God, the FPS is so low, /map/ is like a slideshow!",
     "Why are we playing /map/? Can we vote for a map change?",
     "I heard someone uploaded a remastered version of /map/, but it was deleted.",
@@ -233,7 +235,7 @@ local levelups = {
     "颤抖吧！/rank/还不是我的最终形态！",
     "继续前进，/name//rank/！",
     "芜湖！/name//rank/来了！",
-    "这份力量,让我感到兴奋！",
+    "这份力量，让我感到兴奋！",
     "没想到我还能变得更强！",
     "这就是晋升的感觉吗？",
     "我现在就像开了挂一样强！",
@@ -250,8 +252,8 @@ local levelups = {
     ["en"] = {
     "Feeling invincible!",
     "Tremble! /rank/ isn't even my final form!",
-    "Keep moving forward, /name/ /rank/!",
-    "Woo-hoo! /name/ /rank/ is here!",
+    "Keep moving forward, /rank/ /name/!",
+    "Woo-hoo! /rank/ /name/ is here!",
     "This power makes me excited!",
     "I didn't expect to get even stronger!",
     "So this is what promotion feels like?",
