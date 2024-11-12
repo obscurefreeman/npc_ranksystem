@@ -106,7 +106,7 @@ end
 
 hook.Add( "PopulateToolMenu", "OFKCMenus", function( )
 	if ( GetConVarNumber( "of_populatetoolmenu" ) == nil or GetConVarNumber( "of_populatetoolmenu" ) == 0 ) then
-		spawnmenu.AddToolMenuOption( "Options" , "Obscurefreeman's mod" , "ofkc" , "NPC Rank System" , "" , "" , ofkc )
+		spawnmenu.AddToolMenuOption( "Options" , "Obscurefreeman's mod" , "ofkc" , " NPC Rank System" , "" , "" , ofkc )
 	else
 		spawnmenu.AddToolMenuOption( "OFmod" , "Tools" , "ofkc" , " NPC Rank System" , "" , "" , ofkc )
 		

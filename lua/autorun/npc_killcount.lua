@@ -273,21 +273,21 @@ local levelups = {
 -- 军衔系统和对应颜色
 local ranks = {
     ["zh-CN"] = {
-        [1] = {name = "列兵", color = Color(255, 255, 255)},  -- 白色
-        [2] = {name = "下士", color = Color(255, 127, 80)},   -- 珊瑚色
-        [3] = {name = "中士", color = Color(255, 165, 0)},    -- 橙色
-        [4] = {name = "上士", color = Color(255, 215, 0)},    -- 金色
-        [5] = {name = "少尉", color = Color(144, 238, 144)},  -- 浅绿色
-        [6] = {name = "中尉", color = Color(0, 255, 127)},    -- 春绿色
-        [7] = {name = "上尉", color = Color(34, 139, 34)},    -- 森林绿
-        [8] = {name = "少校", color = Color(135, 206, 250)},  -- 天蓝色
-        [9] = {name = "中校", color = Color(30, 144, 255)},   -- 道奇蓝
-        [10] = {name = "上校", color = Color(0, 0, 205)},     -- 中蓝色
-        [11] = {name = "准将", color = Color(138, 43, 226)},  -- 紫罗兰色
-        [12] = {name = "少将", color = Color(255, 215, 0)},   -- 金色
-        [13] = {name = "中将", color = Color(255, 69, 0)},    -- 红橙色
-        [14] = {name = "上将", color = Color(220, 20, 60)},   -- 猩红色
-        [15] = {name = "元帅", color = Color(139, 0, 0)}      -- 深红色
+        [1] = {name = "列兵", color = Color(255, 255, 255)},
+        [2] = {name = "下士", color = Color(255, 127, 80)},
+        [3] = {name = "中士", color = Color(255, 165, 0)},
+        [4] = {name = "上士", color = Color(255, 215, 0)},
+        [5] = {name = "少尉", color = Color(144, 238, 144)},
+        [6] = {name = "中尉", color = Color(0, 255, 127)},
+        [7] = {name = "上尉", color = Color(34, 139, 34)},
+        [8] = {name = "少校", color = Color(135, 206, 250)},
+        [9] = {name = "中校", color = Color(30, 144, 255)},
+        [10] = {name = "上校", color = Color(0, 0, 205)},
+        [11] = {name = "准将", color = Color(138, 43, 226)},
+        [12] = {name = "少将", color = Color(255, 215, 0)},
+        [13] = {name = "中将", color = Color(255, 69, 0)},
+        [14] = {name = "上将", color = Color(220, 20, 60)},
+        [15] = {name = "元帅", color = Color(139, 0, 0)}
     },
     ["en"] = {
         [1] = {name = "Private", color = Color(255, 255, 255)},
