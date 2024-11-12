@@ -412,7 +412,7 @@ if SERVER then
             local attackerData = npcs[attacker:EntIndex()]
             local victimData = npcs[victim:EntIndex()]
             if attackerData and victimData then
-                timer.Simple(math.random(2, 5), function()
+                timer.Simple(math.random(1, 3), function()
                     local message = taunts[language][math.random(#taunts[language])]
                     local replacements = {
                         ["/victim/"] = victimData.name,
@@ -458,7 +458,7 @@ if SERVER then
             if not ofkc_npc_levelup_chat:GetBool() then return end
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
-                timer.Simple(math.random(2, 5), function()
+                timer.Simple(math.random(1, 3), function()
                     local message = levelups[language][math.random(#levelups[language])]
                     local replacements = {
                         ["/rank/"] = GetRank(npcData.level, language),
