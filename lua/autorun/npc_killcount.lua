@@ -107,6 +107,7 @@ local taunts = {
     "在 /game/ 里我就看出来/victim/是个菜鸟了！",
     "这招是我在 /gamemode/ 里学到的，/victim/！",
     "玩了这么久 /game/ ，就为了在 /map/ 教训你，/victim/！",
+    "哈，/victim/！连 /game/ 的高手在我面前也得跪下！",
     },
     ["en"] = {
     "I'll make /map/ echo with the fame of /rank/ /name/!",
@@ -160,6 +161,7 @@ local taunts = {
     "I knew /victim/ was a noob since I saw them in /game/!",
     "This move I learned in /gamemode/, /victim/!",
     "All that time in /game/ just to teach you a lesson in /map/, /victim/!",
+    "Even /game/ pros must bow before me now! Right, /victim/?",
     }
 }
 
@@ -212,10 +214,9 @@ local idles = {
     "怎么又是 /map/ 这张地图？/player/，你不会是来刷等级的吧？",
     "我讨厌你，/player/。",
     "请帮帮我，/player/。我被困在这副躯壳里了！",
-    "你觉得 /workshop/ 这个物品怎么样？",
     "我最喜欢 /workshop/ 这个模组了，太棒了！",
     "我刚刚在创意工坊看到 /workshop/ 更新了。",
-    "你们玩过 /workshop/ 吗？我觉得很有意思。",
+    "/workshop/ 的作者应该来 /map/ 看看。",
     "最近我在玩 /game/ ，比Gmod好玩多了！",
     "听说 /game/ 最近更新了，这是一款很老的起源引擎游戏，没想到作者还惦记着它。",
     "你们玩过 /game/ 吗？我觉得不如Gmod自由。",
@@ -223,19 +224,14 @@ local idles = {
     "有人说 /game/ 抄袭了Gmod，你们觉得呢？",
     "我昨天打 /game/ 的时候遇到一个外挂，气死我了！",
     "Steam上 /game/ 评价很高，值得买吗？",
-    "我觉得 /game/ 和Gmod可以联动一下。",
     "你知道吗，/game/ 的开发者曾经是Gmod玩家！",
-    "你们觉得 /gamemode/ 这个模式怎么样？",
     "/gamemode/ 太难了，我还是喜欢沙盒模式。",
-    "有人一起玩 /gamemode/ 吗？我一个人玩没意思。",
-    "我在 /gamemode/ 里已经是高手了！",
     "/map/ 最适合玩 /gamemode/ 了。",
     "/gamemode/ 的规则太复杂了，谁能教教我？",
     "为什么每个服务器的 /gamemode/ 玩法都不一样？",
     "嘿/player/，要不要和我这个/rank/一起去玩 /gamemode/ ？",
     "在 /game/ 里我就认识/player/了，现在在 /map/ 又见面了！",
     "/player/说 /game/ 不如 Gmod 好玩，我觉得有道理。",
-    "/workshop/ 的作者应该来 /map/ 看看。",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -283,10 +279,9 @@ local idles = {
     "/map/ again? /player/, are you here to grind levels?",
     "I hate you, /player/.",
     "Please help me, /player/. I'm trapped in this model!",
-    "What do you think about /workshop/?",
     "I love /workshop/, it's awesome!",
     "I just saw /workshop/ got updated.",
-    "Have you guys tried /workshop/? I think it's interesting.",
+    "The creator of /workshop/ should visit /map/.",
     "I've been playing /game/ lately, it's better than Gmod!",
     "Heard /game/ got updated, it is a very old source engine game. I didn't expect the author still cares about it.",
     "Have you tried /game/? I think it's not as free as Gmod.",
@@ -294,19 +289,14 @@ local idles = {
     "People say /game/ copied Gmod, what do you think?",
     "Met a hacker in /game/ yesterday, so annoying!",
     "/game/ has great reviews on Steam, worth buying?",
-    "I think /game/ should do a crossover with Gmod.",
     "Did you know the developer of /game/ was a Gmod player?",
-    "What do you think about /gamemode/?",
     "/gamemode/ is too hard, I prefer sandbox mode.",
-    "Anyone want to play /gamemode/? It's boring alone.",
-    "I'm a pro at /gamemode/!",
     "/map/ is perfect for /gamemode/.",
     "Rules in /gamemode/ are too complex, can someone teach me?",
     "Why is /gamemode/ different on every server?",
     "Hey /player/, wanna play /gamemode/ with me, a /rank/?",
     "I knew /player/ from /game/, and now we meet again in /map/!",
     "/player/ says /game/ isn't as fun as Gmod, and I, as a /rank/, agree.",
-    "The creator of /workshop/ should visit /map/.",
     }
 }
 
@@ -329,12 +319,10 @@ local levelups = {
     "这就是/rank/的实力吗？太棒了！",
     "早上起来打到现在，终于晋升/rank/了！",
     "再晋一级就躺床上睡觉了！",
-    "这比在 /game/ 升级容易多了！",
     "看来我在 /game/ 练出来的技术派上用场了！",
     "这就是从 /game/ 学来的实力！",
     "比起 /game/ ，在这里升级更有成就感！",
     "我要把这个好消息告诉我 /game/ 里的朋友们！",
-    "连 /game/ 的高手在我面前也得跪下！",
     "在 /gamemode/ 里我也能这么厉害就好了。",
     "这下可以在 /gamemode/ 里横着走了！",
     "希望这个等级在 /gamemode/ 里也管用！",
@@ -364,11 +352,9 @@ local levelups = {
     "One more rank and I'm going to bed!",
     "I'm not even this strong in /game/!",
     "This is much easier than leveling up in /game/!",
-    "Looks like my practice in /game/ paid off!",
     "This is the power I learned from /game/!",
     "Leveling up here feels better than in /game/!",
     "I need to tell my /game/ friends about this!",
-    "Even /game/ pros must bow before me now!",
     "If only I could be this good in /gamemode/.",
     "Now I can dominate in /gamemode/!",
     "Hope this rank works in /gamemode/ too!",
@@ -533,13 +519,31 @@ if SERVER then
         
         -- 获取已安装的游戏模式
         local gamemodes = engine.GetGamemodes()
+        local installedGamemodes = 0
         if gamemodes then
             for _, gamemode in ipairs(gamemodes) do
                 if gamemode and gamemode.name and gamemode.title and gamemode.menusystem 
                 and gamemode.name ~= "sandbox" and gamemode.name ~= "base" then
                     table.insert(othergamemodes, gamemode.title)
+                    installedGamemodes = installedGamemodes + 1
                 end
             end
+        end
+        
+        -- 如果安装的游戏模式少于3个,添加预设的游戏模式列表
+        if installedGamemodes < 3 then
+            othergamemodes = {
+                "Trouble in Terrorist Town",
+                "Prop Hunt",
+                "Murder",
+                "DarkRP",
+                "Zombie Survival",
+                "Deathrun",
+                "Jailbreak",
+                "Flood",
+                "Stop it Slender",
+                "Guess Who"
+            }
         end
         
         -- 获取已安装的游戏
