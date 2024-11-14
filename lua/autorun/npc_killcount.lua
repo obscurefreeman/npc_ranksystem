@@ -103,6 +103,10 @@ local taunts = {
     "就连/player/都比/victim/强！",
     "这是为了给/player/复仇！",
     "/player/，帮我记录一下这次精彩的击杀！",
+    "嘿/player/，看到了吗？这就是/rank//name/的实力！",
+    "在/game/里我就看出来/victim/是个菜鸟了！",
+    "这招是我在/gamemode/里学到的，/victim/！",
+    "玩了这么久/game/，就为了在/map/教训你，/victim/！",
     },
     ["en"] = {
     "I'll make /map/ echo with the fame of /rank/ /name/!",
@@ -152,6 +156,10 @@ local taunts = {
     "Hey /player/, did you see that?",
     "Even /player/ is better than /victim/!",
     "/player/, make sure you record this awesome kill!",
+    "Hey /player/, see that? This is the power of /rank/ /name/!",
+    "I knew /victim/ was a noob since I saw them in /game/!",
+    "This move I learned in /gamemode/, /victim/!",
+    "All that time in /game/ just to teach you a lesson in /map/, /victim/!",
     }
 }
 
@@ -204,6 +212,30 @@ local idles = {
     "怎么又是/map/这张地图？/player/，你不会是来刷等级的吧？",
     "我讨厌你，/player/。",
     "请帮帮我，/player/。我被困在这副躯壳里了！",
+    "你觉得/workshop/这个物品怎么样？",
+    "我最喜欢/workshop/这个模组了，太棒了！",
+    "我刚刚在创意工坊看到/workshop/更新了。",
+    "你们玩过/workshop/吗？我觉得很有意思。",
+    "最近我在玩 /game/ ，比Gmod好玩多了！",
+    "听说 /game/ 最近更新了，这是一款很老的起源引擎游戏，没想到作者还惦记着它。",
+    "你们玩过 /game/ 吗？我觉得不如Gmod自由。",
+    "Steam促销的时候我买了 /game/ ，结果一次都没玩过。",
+    "有人说 /game/ 抄袭了Gmod，你们觉得呢？",
+    "我昨天打 /game/ 的时候遇到一个外挂，气死我了！",
+    "Steam上 /game/ 评价很高，值得买吗？",
+    "我觉得 /game/ 和Gmod可以联动一下。",
+    "你知道吗，/game/ 的开发者曾经是Gmod玩家！",
+    "你们觉得/gamemode/这个模式怎么样？",
+    "/gamemode/太难了，我还是喜欢沙盒模式。",
+    "有人一起玩/gamemode/吗？我一个人玩没意思。",
+    "我在/gamemode/里已经是高手了！",
+    "/map/最适合玩/gamemode/了。",
+    "/gamemode/的规则太复杂了，谁能教教我？",
+    "为什么每个服务器的/gamemode/玩法都不一样？",
+    "嘿/player/，要不要和我这个/rank/一起去玩/gamemode/？",
+    "在 /game/ 里我就认识/player/了，现在在/map/又见面了！",
+    "/player/说 /game/ 不如 Gmod 好玩，我觉得有道理。",
+    "/workshop/的作者应该来/map/看看。",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -250,7 +282,31 @@ local idles = {
     "/player/, I've liked you for a long time.",
     "/map/ again? /player/, are you here to grind levels?",
     "I hate you, /player/.",
-    "Please help me, /player/. I'm trapped in this model!"
+    "Please help me, /player/. I'm trapped in this model!",
+    "What do you think about /workshop/?",
+    "I love /workshop/, it's awesome!",
+    "I just saw /workshop/ got updated.",
+    "Have you guys tried /workshop/? I think it's interesting.",
+    "I've been playing /game/ lately, it's better than Gmod!",
+    "Heard /game/ got updated, it is a very old source engine game. I didn't expect the author still cares about it.",
+    "Have you tried /game/? I think it's not as free as Gmod.",
+    "Bought /game/ during Steam sale, never played it once.",
+    "People say /game/ copied Gmod, what do you think?",
+    "Met a hacker in /game/ yesterday, so annoying!",
+    "/game/ has great reviews on Steam, worth buying?",
+    "I think /game/ should do a crossover with Gmod.",
+    "Did you know the developer of /game/ was a Gmod player?",
+    "What do you think about /gamemode/?",
+    "/gamemode/ is too hard, I prefer sandbox mode.",
+    "Anyone want to play /gamemode/? It's boring alone.",
+    "I'm a pro at /gamemode/!",
+    "/map/ is perfect for /gamemode/.",
+    "Rules in /gamemode/ are too complex, can someone teach me?",
+    "Why is /gamemode/ different on every server?",
+    "Hey /player/, wanna play /gamemode/ with me, a /rank/?",
+    "I knew /player/ from /game/, and now we meet again in /map/!",
+    "/player/ says /game/ isn't as fun as Gmod, and I, as a /rank/, agree.",
+    "The creator of /workshop/ should visit /map/.",
     }
 }
 
@@ -272,7 +328,21 @@ local levelups = {
     "终于晋升/rank/了，太棒了！",
     "这就是/rank/的实力吗？太棒了！",
     "早上起来打到现在，终于晋升/rank/了！",
-    "再晋一级就躺床上睡觉了！"
+    "再晋一级就躺床上睡觉了！",
+    "这比在/game/升级容易多了！",
+    "看来我在/game/练出来的技术派上用场了！",
+    "这就是从/game/学来的实力！",
+    "比起/game/，在这里升级更有成就感！",
+    "我要把这个好消息告诉我/game/里的朋友们！",
+    "连/game/的高手在我面前也得跪下！",
+    "在/gamemode/里我也能这么厉害就好了。",
+    "这下可以在/gamemode/里横着走了！",
+    "希望这个等级在/gamemode/里也管用！",
+    "太棒了！在/map/当上/rank/的感觉真好！",
+    "/player/，快看，/name/终于成为/rank/了！",
+    "我/name/可是/rank/，在/map/横着走的存在！",
+    "在/game/里我是菜鸟，但在/map/我可是/rank//name/！",
+    "等我在/gamemode/也当上/rank/，就能和/player/一起称霸/map/了！",
     },
     ["en"] = {
     "Feeling invincible!",
@@ -291,7 +361,22 @@ local levelups = {
     "Finally promoted to /rank/, awesome!",
     "Is this the power of /rank/? Amazing!",
     "Been playing since morning, finally reached /rank/!",
-    "One more rank and I'm going to bed!"
+    "One more rank and I'm going to bed!",
+    "I'm not even this strong in /game/!",
+    "This is much easier than leveling up in /game/!",
+    "Looks like my practice in /game/ paid off!",
+    "This is the power I learned from /game/!",
+    "Leveling up here feels better than in /game/!",
+    "I need to tell my /game/ friends about this!",
+    "Even /game/ pros must bow before me now!",
+    "If only I could be this good in /gamemode/.",
+    "Now I can dominate in /gamemode/!",
+    "Hope this rank works in /gamemode/ too!",
+    "Amazing! Feels great to become a /rank/ in /map/!",
+    "Look /player/, /name/ finally became a /rank/!",
+    "I, /name/, am a /rank/, unstoppable in /map/!",
+    "I'm a noob in /game/, but in /map/ I'm /name/ the /rank/!",
+    "Once I become a /rank/ in /gamemode/, I'll rule /map/ with /player/!",
     }
 }
 
@@ -375,6 +460,7 @@ end
 
 -- NPC 数据存储
 local npcs = {}
+local workshopItems = {}
 
 -- 服务器端代码
 if SERVER then
@@ -428,6 +514,44 @@ if SERVER then
         net.WriteTable(data)
         net.Broadcast()
     end
+    
+    hook.Add("InitPostEntity", "Initaddon", function()
+        -- 确保表已初始化
+        workshopItems = workshopItems or {}
+        othergamemodes = othergamemodes or {}
+        othergames = othergames or {}
+        
+        -- 获取已安装的创意工坊物品
+        local addons = engine.GetAddons()
+        if addons then
+            for _, addon in ipairs(addons) do
+                if addon and addon.mounted and addon.title then
+                    table.insert(workshopItems, addon.title)
+                end
+            end
+        end
+        
+        -- 获取已安装的游戏模式
+        local gamemodes = engine.GetGamemodes()
+        if gamemodes then
+            for _, gamemode in ipairs(gamemodes) do
+                if gamemode and gamemode.name and gamemode.title and gamemode.menusystem 
+                and gamemode.name ~= "sandbox" and gamemode.name ~= "base" then
+                    table.insert(othergamemodes, gamemode.title)
+                end
+            end
+        end
+        
+        -- 获取已安装的游戏
+        local games = engine.GetGames()
+        if games then
+            for _, game in ipairs(games) do
+                if game and game.installed and game.title then
+                    table.insert(othergames, game.title)
+                end
+            end
+        end
+    end)
 
     -- NPC说话函数
     local function NPCTalk(talkType, attacker, victim)
@@ -453,7 +577,10 @@ if SERVER then
                         ["/rank/"] = GetRank(attackerData.level, language),
                         ["/name/"] = attackerData.name,
                         ["/map/"] = game.GetMap(),
-                        ["/player/"] = playerName
+                        ["/player/"] = playerName,
+                        ["/workshop/"] = workshopItems[math.random(#workshopItems)],
+                        ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
+                        ["/game/"] = othergames[math.random(#othergames)]
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local attackerRank = GetRank(attackerData.level, language)
@@ -482,7 +609,10 @@ if SERVER then
                     ["/rank/"] = GetRank(npcData.level, language),
                     ["/name/"] = npcData.name,
                     ["/map/"] = game.GetMap(),
-                    ["/player/"] = playerName
+                    ["/player/"] = playerName,
+                    ["/workshop/"] = workshopItems[math.random(#workshopItems)],
+                    ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
+                    ["/game/"] = othergames[math.random(#othergames)]
                 }
                 local formattedMessage = processMessage(message, replacements)
                 local npcRank = GetRank(npcData.level, language)
@@ -511,7 +641,10 @@ if SERVER then
                         ["/rank/"] = GetRank(npcData.level, language),
                         ["/name/"] = npcData.name,
                         ["/map/"] = game.GetMap(),
-                        ["/player/"] = playerName
+                        ["/player/"] = playerName,
+                        ["/workshop/"] = workshopItems[math.random(#workshopItems)],
+                        ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
+                        ["/game/"] = othergames[math.random(#othergames)]
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local npcRank = GetRank(npcData.level, language)
@@ -950,7 +1083,7 @@ if CLIENT then
         
         local infoText
         if npcData.level >= 15 then
-            infoText = string.format(language == "zh-CN" and "等级: %d | 击杀: %d | 经验: 满级" or "Level: %d | Kills: %d | XP: MAX", 
+            infoText = string.format(language == "zh-CN" and "��级: %d | 击杀: %d | 经验: 满级" or "Level: %d | Kills: %d | XP: MAX", 
                 npcData.level, npcData.kills)
         else
             local requiredExp = GetRequiredExp(npcData.level)
