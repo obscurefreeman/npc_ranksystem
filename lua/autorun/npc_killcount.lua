@@ -103,7 +103,7 @@ local taunts = {
     "就连/player/都比/victim/强！",
     "这是为了给/player/复仇！",
     "/player/，帮我记录一下这次精彩的击杀！",
-    "嘿/player/，看到了吗？这就是/rank//name/的实力！",
+    "嘿，/player/，看到了吗？这就是/rank//name/的实力！",
     "在 /game/ 里我就看出来/victim/是个菜鸟了！",
     "这招是我在 /gamemode/ 里学到的，/victim/！",
     "玩了这么久 /game/ ，就为了在 /map/ 教训你，/victim/！",
@@ -214,6 +214,7 @@ local idles = {
     "怎么又是 /map/ 这张地图？/player/，你不会是来刷等级的吧？",
     "我讨厌你，/player/。",
     "请帮帮我，/player/。我被困在这副躯壳里了！",
+    "你疯了吗，/player/？你在干什么？",
     "我最喜欢 /workshop/ 这个模组了，太棒了！",
     "我刚刚在创意工坊看到 /workshop/ 更新了。",
     "/workshop/ 的作者应该来 /map/ 看看。",
@@ -232,6 +233,9 @@ local idles = {
     "嘿/player/，要不要和我这个/rank/一起去玩 /gamemode/ ？",
     "在 /game/ 里我就认识/player/了，现在在 /map/ 又见面了！",
     "/player/说 /game/ 不如 Gmod 好玩，我觉得有道理。",
+    "/time/ 了，该睡觉了。",
+    "现在是 /time/，我得去吃饭了。",
+    "该死，我得去洗澡了，现在是 /time/。",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -279,6 +283,7 @@ local idles = {
     "/map/ again? /player/, are you here to grind levels?",
     "I hate you, /player/.",
     "Please help me, /player/. I'm trapped in this model!",
+    "Are you crazy, /player/? What are you doing?",
     "I love /workshop/, it's awesome!",
     "I just saw /workshop/ got updated.",
     "The creator of /workshop/ should visit /map/.",
@@ -297,6 +302,9 @@ local idles = {
     "Hey /player/, wanna play /gamemode/ with me, a /rank/?",
     "I knew /player/ from /game/, and now we meet again in /map/!",
     "/player/ says /game/ isn't as fun as Gmod, and I, as a /rank/, agree.",
+    "/time/ is coming, it's time to sleep.",
+    "It's /time/, I need to eat.",
+    "Damn, it's /time/, I need to take a shower.",
     }
 }
 
@@ -608,7 +616,8 @@ if SERVER then
                         ["/player/"] = playerName,
                         ["/workshop/"] = workshopItems[math.random(#workshopItems)],
                         ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
-                        ["/game/"] = othergames[math.random(#othergames)]
+                        ["/game/"] = othergames[math.random(#othergames)],
+                        ["/time/"] = os.date("%H:%M")
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local attackerRank = GetRank(attackerData.level, language)
@@ -640,7 +649,8 @@ if SERVER then
                     ["/player/"] = playerName,
                     ["/workshop/"] = workshopItems[math.random(#workshopItems)],
                     ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
-                    ["/game/"] = othergames[math.random(#othergames)]
+                    ["/game/"] = othergames[math.random(#othergames)],
+                    ["/time/"] = os.date("%H:%M")
                 }
                 local formattedMessage = processMessage(message, replacements)
                 local npcRank = GetRank(npcData.level, language)
@@ -672,7 +682,8 @@ if SERVER then
                         ["/player/"] = playerName,
                         ["/workshop/"] = workshopItems[math.random(#workshopItems)],
                         ["/gamemode/"] = othergamemodes[math.random(#othergamemodes)],
-                        ["/game/"] = othergames[math.random(#othergames)]
+                        ["/game/"] = othergames[math.random(#othergames)],
+                        ["/time/"] = os.date("%H:%M")
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local npcRank = GetRank(npcData.level, language)
@@ -695,6 +706,10 @@ if SERVER then
         
         local allNPCs = ents.FindByClass("npc_*")
         if #allNPCs > 0 then
+            -- 根据NPC数量计算聊天间隔
+            local chatInterval = math.max(3, 10 - (#allNPCs - 1) * (7/14)) -- 从10秒线性降低到3秒
+            timer.Adjust("NPCIdleChat", chatInterval, 0)
+            
             local randomNPC = allNPCs[math.random(#allNPCs)]
             if IsValid(randomNPC) and randomNPC:GetClass() ~= "npc_bullseye" then
                 NPCTalk("idle", randomNPC)
