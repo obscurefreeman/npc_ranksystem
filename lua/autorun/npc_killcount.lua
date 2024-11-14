@@ -445,7 +445,7 @@ if SERVER then
                     -- 获取随机玩家名字
                     local players = player.GetAll()
                     local randomPlayer = players[math.random(#players)]
-                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "Unknown Player"
 
                     local replacements = {
                         ["/victim/"] = victimData.name,
@@ -476,7 +476,7 @@ if SERVER then
                 -- 获取随机玩家名字
                 local players = player.GetAll()
                 local randomPlayer = players[math.random(#players)]
-                local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+                local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "Unknown Player"
                 
                 local replacements = {
                     ["/rank/"] = GetRank(npcData.level, language),
@@ -505,7 +505,7 @@ if SERVER then
                     -- 获取随机玩家名字
                     local players = player.GetAll()
                     local randomPlayer = players[math.random(#players)]
-                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "Unknown Player"
                     
                     local replacements = {
                         ["/rank/"] = GetRank(npcData.level, language),
