@@ -52,6 +52,7 @@ local npcNames = {
 -- 对话池
 local taunts = {
     ["zh-CN"] = {
+    "我要让/map/响彻/name//rank/的威名！",
     "/victim/，你的战斗技巧还需要提高！",
     "看来/victim/今天状态不太好啊~",
     "抱歉了/victim/，这就是实力的差距！", 
@@ -98,8 +99,13 @@ local taunts = {
     "这么菜也配在/map/挑战我一个等级为/rank/的人？",
     "不是/victim/你行不行啊？我还没发挥实力呢！",
     "/map/又多了一具尸体，一路顺风，/victim/。",
+    "嘿，/player/，看到我刚才的表现了吗?",
+    "就连/player/都比/victim/强！",
+    "这是为了给/player/复仇！",
+    "/player/，帮我记录一下这次精彩的击杀！",
     },
     ["en"] = {
+    "I'll make /map/ echo with the fame of /rank/ /name/!",
     "/victim/, your combat skills need improvement!",
     "Looks like /victim/ isn't having a good day~",
     "Sorry /victim/, this is the gap in strength!", 
@@ -142,7 +148,10 @@ local taunts = {
     "Cry, /victimrank/ /victim/!",
     "Yeah, try not to die next time, /victim/.", 
     "/rank/ destroyed /victimrank/, this is a pub stomp.",
-    "I've been playing this game since I was three, /victimrank/ /victim/."
+    "I've been playing this game since I was three, /victimrank/ /victim/.",
+    "Hey /player/, did you see that?",
+    "Even /player/ is better than /victim/!",
+    "/player/, make sure you record this awesome kill!",
     }
 }
 
@@ -157,7 +166,6 @@ local idles = {
     "希望/map/能一直这么热闹。",
     "你知道如何快速升等级吗？/rank/等级太低了！",
     "这里的空气中弥漫着火药味。",
-    "我要让/map/响彻/name//rank/的威名！",
     "/map/的每个角落都值得探索。",
     "不知道/map/今天会发生什么有趣的事。",
     "/map/这张地图没有CSS也可以玩吗？",
@@ -186,9 +194,16 @@ local idles = {
     "Steam 促销开始了，你们买了什么？",
     "我是这个服务器的主人！向我鞠躬！",
     "这个游戏看起来糟糕透了，Gmod的黄金时代已经过去了。",
-    "房主能放一些音乐吗？",
-    "180.100.47.6 这是你的IP地址吗？我可是一个黑客哦！",
+    "180.100.47.6 这是你的IP地址吗？我可是一个开盒高手哦！",
     "我已经 76 岁了，但我还是每天启动Gmod。",
+    "看看这是谁来了，/player/？",
+    "/player/？什么风把你吹来了？",
+    "/player/，你知道怎么获取经验吗？我是新手。",
+    "嘿，/player/，是时候放一些音乐了！",
+    "/player/，其实。。我喜欢你很久了！",
+    "怎么又是/map/这张地图？/player/，你不会是来刷等级的吧？",
+    "我讨厌你，/player/。",
+    "请帮帮我，/player/。我被困在这副躯壳里了！",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -200,7 +215,6 @@ local idles = {
     "Hope /map/ stays this chaotic.",
     "Do you know how to level up quickly? /rank/ level is too low!",
     "The air here smells of gunpowder.",
-    "I'll make /map/ echo with the fame of /rank/ /name/!",
     "Every corner of /map/ is worth exploring.",
     "Wonder what interesting things will happen in /map/ today.",
     "Can you play /map/ without CSS?",
@@ -225,7 +239,18 @@ local idles = {
     "I want to play the nuke mod.",
     "Do you know the 'UC' weapon pack? I love how these weapons feel.",
     "Steam sale started, what did you buy?",
-    "I am the master of this server! Bow before me!"
+    "I am the master of this server! Bow before me!",
+    "This game looks terrible, the golden age of Gmod is over.",
+    "180.100.47.6 Is that your IP address? I'm a hacker!",
+    "I'm 76 years old, but I still start Gmod every day.",
+    "Look who's here, /player/?",
+    "/player/? What brought you here?",
+    "/player/, do you know how to get experience? I'm new here.",
+    "Hey /player/, it's time for some music!",
+    "/player/, I've liked you for a long time.",
+    "/map/ again? /player/, are you here to grind levels?",
+    "I hate you, /player/.",
+    "Please help me, /player/. I'm trapped in this model!"
     }
 }
 
@@ -416,12 +441,19 @@ if SERVER then
             if attackerData and victimData then
                 timer.Simple(math.random(1, 3), function()
                     local message = taunts[language][math.random(#taunts[language])]
+
+                    -- 获取随机玩家名字
+                    local players = player.GetAll()
+                    local randomPlayer = players[math.random(#players)]
+                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+
                     local replacements = {
                         ["/victim/"] = victimData.name,
                         ["/victimrank/"] = GetRank(victimData.level, language),
                         ["/rank/"] = GetRank(attackerData.level, language),
                         ["/name/"] = attackerData.name,
-                        ["/map/"] = game.GetMap()
+                        ["/map/"] = game.GetMap(),
+                        ["/player/"] = playerName
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local attackerRank = GetRank(attackerData.level, language)
@@ -440,10 +472,17 @@ if SERVER then
             local npcData = npcs[attacker:EntIndex()]
             if npcData then
                 local message = idles[language][math.random(#idles[language])]
+
+                -- 获取随机玩家名字
+                local players = player.GetAll()
+                local randomPlayer = players[math.random(#players)]
+                local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+                
                 local replacements = {
                     ["/rank/"] = GetRank(npcData.level, language),
                     ["/name/"] = npcData.name,
-                    ["/map/"] = game.GetMap()
+                    ["/map/"] = game.GetMap(),
+                    ["/player/"] = playerName
                 }
                 local formattedMessage = processMessage(message, replacements)
                 local npcRank = GetRank(npcData.level, language)
@@ -462,10 +501,17 @@ if SERVER then
             if npcData then
                 timer.Simple(math.random(1, 3), function()
                     local message = levelups[language][math.random(#levelups[language])]
+                    
+                    -- 获取随机玩家名字
+                    local players = player.GetAll()
+                    local randomPlayer = players[math.random(#players)]
+                    local playerName = IsValid(randomPlayer) and randomPlayer:Nick() or "未知玩家"
+                    
                     local replacements = {
                         ["/rank/"] = GetRank(npcData.level, language),
                         ["/name/"] = npcData.name,
-                        ["/map/"] = game.GetMap()
+                        ["/map/"] = game.GetMap(),
+                        ["/player/"] = playerName
                     }
                     local formattedMessage = processMessage(message, replacements)
                     local npcRank = GetRank(npcData.level, language)
