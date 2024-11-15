@@ -1,5 +1,12 @@
 # NPC Rank System
 
+![Subscriptions](https://img.shields.io/steam/subscriptions/3364360854?style=for-the-badge&color=b4e419)
+![Downloads](https://img.shields.io/steam/downloads/3364360854?style=for-the-badge&color=00adb5)
+![Views](https://img.shields.io/steam/views/3364360854?style=for-the-badge&color=ff5719)
+![Size](https://img.shields.io/steam/size/3364360854?style=for-the-badge&color=2ea043)
+![Release Date](https://img.shields.io/steam/release-date/3364360854?style=for-the-badge&color=ffb300)
+![Update Date](https://img.shields.io/steam/update-date/3364360854?style=for-the-badge&color=515de9)
+
 This is a plugin that implements an NPC leveling and progression system. It adds rich ranking mechanics and interactive features for NPCs in your game.
 
 ### 😋 Key Features
@@ -31,6 +38,13 @@ Got great ideas? We warmly welcome community members to participate in the proje
 🎨 Creative Proposals: Report issues or suggest improvements.
 
 # NPC 等级系统
+
+![订阅](https://img.shields.io/steam/subscriptions/3364360854?style=for-the-badge&label=订阅&color=b4e419)
+![下载](https://img.shields.io/steam/downloads/3364360854?style=for-the-badge&label=下载&color=00adb5)
+![浏览量](https://img.shields.io/steam/views/3364360854?style=for-the-badge&label=浏览量&color=ff5719)
+![模组大小](https://img.shields.io/steam/size/3364360854?style=for-the-badge&label=模组大小&color=2ea043)
+![发布日期](https://img.shields.io/steam/release-date/3364360854?style=for-the-badge&label=发布日期&color=ffb300)
+![更新日期](https://img.shields.io/steam/update-date/3364360854?style=for-the-badge&label=更新日期&color=515de9)
 
 这是一个 NPC 等级进阶系统插件。它为游戏中的 NPC 添加了丰富的等级机制和互动功能。
 
