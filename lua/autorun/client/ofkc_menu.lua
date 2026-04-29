@@ -24,7 +24,10 @@ local lang = {
         idle_chat = "NPC 文字闲聊",
         idle_chat_help = "是否启用NPC闲聊。",
         levelup_chat = "NPC 晋级文字",
-        levelup_chat_help = "NPC晋级时是否讲话。"
+        levelup_chat_help = "是否启用NPC晋级消息。",
+        lang_select = "语言选择",
+        lang_select_help = "请选择界面显示语言。",
+        lang_system = "Follow Gmod Language",
     },
     ["en"] = {
         title = "NPC Rank System Settings",
@@ -49,17 +52,44 @@ local lang = {
         idle_chat = "NPC Idle Chat",
         idle_chat_help = "Enable NPC idle chat.",
         levelup_chat = "NPC Rank Up Chat",
-        levelup_chat_help = "Enable NPC rank up messages."
+        levelup_chat_help = "Enable NPC rank up messages.",
+        lang_select = "Language Selection",
+        lang_select_help = "Choose the display language.",
+        lang_system = "Follow Gmod Language",
     }
 }
 
 local function ofkc(pnl)
-    local ln, lg = GetConVar("gmod_language"):GetString(), "en"
-    if ln != nil and lang[ln] then
+    local ln, lg = OFKC_GetLanguage(), "en"
+    if ln ~= nil and lang[ln] then
         lg = ln
     end
 
     pnl:ControlHelp(lang[lg].title)
+
+    -- 语言选择下拉框
+    -- 修正：重写语言下拉框部分，避免 ComboBox 返回 id 而不是面板控件
+    local combo = pnl:ComboBox(lang[lg].lang_select, "ofkc_lang")
+    combo:AddChoice(lang[lg].lang_system, "")
+    combo:AddChoice("简体中文", "zh-CN")
+    combo:AddChoice("English", "en")
+
+    -- 设置当前选中项（让ComboBox能反映当前选项）
+    local cur = GetConVar("ofkc_lang"):GetString()
+    if cur == "" then
+        combo:ChooseOptionID(1)
+    elseif cur == "zh-CN" then
+        combo:ChooseOptionID(2)
+    elseif cur == "en" then
+        combo:ChooseOptionID(3)
+    end
+
+    -- 控制变量变更时更新ConVar
+    combo.OnSelect = function(_, index, value, data)
+        RunConsoleCommand("ofkc_lang", data or "")
+        RunConsoleCommand("spawnmenu_reload")
+    end
+    pnl:Help(lang[lg].lang_select_help)
 
     local Default = {
         ["ofkc_player"] = 1,

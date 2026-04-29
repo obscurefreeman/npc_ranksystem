@@ -10,9 +10,6 @@ local npcNames = {
     "安德森","布朗","戴维斯","埃文斯","怀特",
     "克拉克","摩尔","琼斯","格林","亚当斯",
     "刘易斯","金斯利","帕克","威尔森","科林斯",
-    "尤里","伊万诺夫","戈尔巴乔夫","迪米特里",
-    "马克西姆","阿尔乔姆","阿列克谢",
-    "薄荷","迷迭香","鱼腥草",
     "百里香","鼠尾草","薰衣草",
     "芫荽","骇人鲨鱼","河豚",
     "探戈","猎狐者","狐狸","犰狳",
@@ -23,7 +20,12 @@ local npcNames = {
     "盖瑞猫咪","半条命3","柔软的床",
     "白色哀悼","钓鱼人","该名称已被占用",
     "键盘侠","萌新求带","冒险家",
-    "在线摸鱼","我不是挂"
+    "在线摸鱼","我不是挂","真正的盖瑞",
+    "除暴者","质检员","叛徒","穷鬼",
+    "小透明","意大利人","漫步者",
+    "绞盘","轴承","弹簧","轮毂","螺丝刀","沾油手",
+    "助燃剂","黯淡","玻璃","铃兰","分拣员",
+    "雨行者","微光","暮夜","面具","松鼠","龙虾","牛油果",
     },
     ["en"] = {
     "Johnson", "Yang", "Jin",
@@ -35,8 +37,6 @@ local npcNames = {
     "Anderson", "Brown", "Davis", "Evans",
     "Clark", "Moore", "Jones", "Green", "Adams",
     "Lewis", "Kingsley", "Parker", "Wilson", "Collins",
-    "Yuri", "Ivanov", "Gorbachev",
-    "Mint", "Rosemary", "Houttuynia",
     "Thyme", "Sage", "Lavender", 
     "Coriander", "Fearsomeshark", "Pufferfish",
     "Tango", "Fox-hunter", "Fox", "Armadillo",
@@ -45,7 +45,12 @@ local npcNames = {
     "Anonymous", "Ochre", "Pajama-party",
     "Santa", "Aarney",
     "Garry's Cat", "Half-Life 3",
-    "White mourning", "Fisherman", "Name already taken"
+    "White mourning", "Fisherman", "Name already taken","Real Garry",
+    "Vigilante", "Inspector", "Traitor",
+    "Invisible", "Italian", "Wanderer",
+    "Winch", "Bearing", "Screwdriver", "Greasy Hands",
+    "Accelerant", "Dim", "Glass", "Sorter",
+    "Rainwalker", "Glimmer", "Dusk", "Mask", "Squirrel", "Lobster", "Avocado",
     }
 }
 
@@ -423,16 +428,41 @@ local ranks = {
     }
 }
 
+local ofkc_lang = CreateConVar("ofkc_lang", "", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Language of NPC level system.")
+local ofkc_enabled = CreateConVar("ofkc_enabled", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC level system (0=off, 1=on)")
+local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set if NPCs have random levels (0=start from level 1, 1=random level)")
+local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set NPC text display mode (0=screen center, 1=above NPC)")
+local ofkc_npc_levelup_effect = CreateConVar("ofkc_npc_levelup_effect", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable level up effects (0=off, 1=on)")
+local ofkc_npc_levelup_message = CreateConVar("ofkc_npc_levelup_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable level up messages (0=off, 1=on)")
+local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable kill messages (0=off, 1=on)")
+local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set if same type NPC kills give XP (0=penalty XP, 1=gain XP)")
+local ofkc_npc_levelup_heal = CreateConVar("ofkc_npc_levelup_heal", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Heal on level up (0=off, 1=on)")
+local ofkc_npc_taunt = CreateConVar("ofkc_npc_taunt", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC taunts (0=off, 1=on)")
+local ofkc_npc_idle_chat = CreateConVar("ofkc_npc_idle_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC idle chat (0=off, 1=on)")
+local ofkc_npc_levelup_chat = CreateConVar("ofkc_npc_levelup_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC level up chat (0=off, 1=on)")
+
+function OFKC_GetLanguage()
+    local lang = GetConVar("ofkc_lang"):GetString()
+    if lang and lang ~= "" then
+        return lang
+    end
+    local sysLang = GetConVar("gmod_language"):GetString()
+    if sysLang and sysLang ~= "" then
+        return sysLang
+    end
+    return "en"
+end
+
 -- 获取军衔的函数
 local function GetRank(level, language)
-    language = language or GetConVar("gmod_language"):GetString()
+    language = language or OFKC_GetLanguage()
     if not ranks[language] then language = "en" end
     return ranks[language][math.min(level, 15)].name
 end
 
 -- 获取军衔颜色的函数
 local function GetRankColor(level, language)
-    language = language or GetConVar("gmod_language"):GetString()
+    language = language or OFKC_GetLanguage()
     if not ranks[language] then language = "en" end
     return ranks[language][math.min(level, 15)].color
 end
@@ -475,19 +505,6 @@ if SERVER then
     util.AddNetworkString("NPCTalk_Taunt")
     util.AddNetworkString("NPCTalk_Idle") 
     util.AddNetworkString("NPCTalk_LevelUp")
-
-    -- 创建ConVar
-    local ofkc_enabled = CreateConVar("ofkc_enabled", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC level system (0=off, 1=on)")
-    local ofkc_npc_random_level = CreateConVar("ofkc_npc_random_level", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set if NPCs have random levels (0=start from level 1, 1=random level)")
-    local ofkc_npc_text_mode = CreateConVar("ofkc_npc_text_mode", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set NPC text display mode (0=screen center, 1=above NPC)")
-    local ofkc_npc_levelup_effect = CreateConVar("ofkc_npc_levelup_effect", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable level up effects (0=off, 1=on)")
-    local ofkc_npc_levelup_message = CreateConVar("ofkc_npc_levelup_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable level up messages (0=off, 1=on)")
-    local ofkc_npc_kill_message = CreateConVar("ofkc_npc_kill_message", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable kill messages (0=off, 1=on)")
-    local ofkc_npc_friendly_fire = CreateConVar("ofkc_npc_friendly_fire", "0", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Set if same type NPC kills give XP (0=penalty XP, 1=gain XP)")
-    local ofkc_npc_levelup_heal = CreateConVar("ofkc_npc_levelup_heal", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Heal on level up (0=off, 1=on)")
-    local ofkc_npc_taunt = CreateConVar("ofkc_npc_taunt", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC taunts (0=off, 1=on)")
-    local ofkc_npc_idle_chat = CreateConVar("ofkc_npc_idle_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC idle chat (0=off, 1=on)")
-    local ofkc_npc_levelup_chat = CreateConVar("ofkc_npc_levelup_chat", "1", FCVAR_ARCHIVE + FCVAR_REPLICATED, "Enable NPC level up chat (0=off, 1=on)")
 
     -- 处理消息替换的函数
     local function processMessage(message, replacements)
@@ -602,7 +619,7 @@ if SERVER then
 
     -- NPC说话函数
     local function NPCTalk(talkType, attacker, victim)
-        local language = GetConVar("gmod_language"):GetString()
+        local language = OFKC_GetLanguage()
         if not taunts[language] then language = "en" end
         
         if talkType == "taunt" and IsValid(attacker) and IsValid(victim) then
@@ -742,7 +759,7 @@ if SERVER then
                 initialLevel = math.random(1, 15)
             end
             
-            local language = GetConVar("gmod_language"):GetString()
+            local language = OFKC_GetLanguage()
             if not npcNames[language] then language = "en" end
             
             local npcData = {
@@ -765,7 +782,7 @@ if SERVER then
         if not npc:IsNPC() or not attacker:IsNPC() then return end
         if attacker:GetClass() == "npc_bullseye" or npc:GetClass() == "npc_bullseye" then return end
         
-        local language = GetConVar("gmod_language"):GetString()
+        local language = OFKC_GetLanguage()
         if not ranks[language] then language = "en" end
         
         local attackerIndex = attacker:EntIndex()
@@ -968,7 +985,7 @@ if CLIENT then
     surface.CreateFont("ofkctext3d", {
         font = "HONOR Sans CN",
         extended = true,
-        size = 60
+        size = 40
     })
 
     -- 存储NPC升级特效数据
@@ -1034,7 +1051,7 @@ if CLIENT then
     net.Receive("BroadcastMessage", function()
         local messageType = net.ReadUInt(4)
         local data = net.ReadTable()
-        local language = GetConVar("gmod_language"):GetString()
+        local language = OFKC_GetLanguage()
         if not ranks[language] then language = "en" end
         
         if messageType == 1 then -- 升级/降级消息
@@ -1106,7 +1123,7 @@ if CLIENT then
         -- 如果npc_text_mode为1，则不在HUD上显示
         if GetConVar("ofkc_npc_text_mode"):GetInt() == 1 then return end
         
-        local language = GetConVar("gmod_language"):GetString()
+        local language = OFKC_GetLanguage()
         if not ranks[language] then language = "en" end
         
         local rank = GetRank(npcData.level, language)
@@ -1155,7 +1172,7 @@ if CLIENT then
         local ply = LocalPlayer()
         if not IsValid(ply) then return end
         
-        local language = GetConVar("gmod_language"):GetString()
+        local language = OFKC_GetLanguage()
         if not ranks[language] then language = "en" end
 
         for _, ent in ipairs(ents.FindByClass("npc_*")) do
