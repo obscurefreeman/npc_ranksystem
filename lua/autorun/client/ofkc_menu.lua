@@ -89,16 +89,6 @@ local function ofkc(pnl)
         RunConsoleCommand("ofkc_lang", data or "")
         RunConsoleCommand("spawnmenu_reload")
     end
-    pnl:Help(lang[lg].lang_select_help)
-
-    local Default = {
-        ["ofkc_player"] = 1,
-        ["ofkc_npc"] = 1,
-        ["ofkc_realname"] = 0,
-        ["ofkc_detail"] = 0
-    }
-
-    pnl:AddControl("ComboBox", {["MenuButton"] = 1, ["Folder"] = "ofkc", ["Options"] = {["#preset.default"] = Default}, ["CVars"] = table.GetKeys(Default)})
 
     pnl:CheckBox(lang[lg].enabled, "ofkc_enabled")
     pnl:Help(lang[lg].enabled_help)

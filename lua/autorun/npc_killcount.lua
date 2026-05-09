@@ -211,6 +211,8 @@ local idles = {
     "这个游戏看起来糟糕透了，Gmod的黄金时代已经过去了。",
     "180.100.47.6 这是你的IP地址吗？我可是一个开盒高手哦！",
     "我已经 76 岁了，但我还是每天启动Gmod。",
+    "你们觉得Gman是真实存在的吗？",
+    "我是新玩家，听说这游戏有《马桶人》的角色，你们觉得哪个角色最强？",
     "看看这是谁来了，/player/？",
     "/player/？什么风把你吹来了？",
     "/player/，你知道怎么获取经验吗？我是新手。",
@@ -234,22 +236,42 @@ local idles = {
     "/map/ 最适合玩 /gamemode/ 了。",
     "/gamemode/ 的规则太复杂了，谁能教教我？",
     "为什么每个服务器的 /gamemode/ 玩法都不一样？",
-    "嘿/player/，要不要和我这个/rank/一起去玩 /gamemode/ ？",
+    "嘿，/player/，要不要和我这个/rank/一起去玩 /gamemode/ ？",
     "在 /game/ 里我就认识/player/了，现在在 /map/ 又见面了！",
     "/player/说 /game/ 不如 Gmod 好玩，我觉得有道理。",
     "/time/ 了，该睡觉了。",
     "现在是 /time/，我得去吃饭了。",
     "该死，我得去洗澡了，现在是 /time/。",
-    "都 /time/ 了，怎么 /player/ 还在线？",
+    "都 /time/ 了，怎么/player/还在线？",
     "我已经在 /map/ 待了一整天了，现在是 /time/。",
     "现在是 /time/，该去打卡了。",
     "这个服务器里有比/rank/更高的等级吗？",
     "我觉得/rank/这个称号配不上我。",
-    "/player/ 说有人在 /map/ 看到过一个神秘的黑色 NPC。",
+    "/player/说有人在 /map/ 看到过一个神秘的黑色 NPC。",
     "我好痛苦，/player/，能安慰一下我吗？",
+    "我在 /map/ 上找了半天，结果/player/在角落挂机。",
+    "/player/是服务器管理员吗？",
+    "你们觉得 /map/ 上哪儿最适合藏东西？",
+    "/player/，要不要一起去探索 /map/ 的秘密通道？",
+    "我和/player/是现实中的朋友，一起来玩的。",
+    "/game/ 的原声带是真的好听。",
+    "/player/刚刚差点把服务器玩崩了！",
+    "没想到 /map/ 里还有这种秘密房间。",
+    "/player/上次在 /game/ 里虐我，现在我要复仇！",
+    "我现在超困，都 /time/ 了还不下线。",
+    "大家聚在 /map/ 的中间，是不是要开派对？",
+    "我打算录个 /gamemode/ 的视频发B站。",
+    "谁最先发现 /map/ 的彩蛋？",
+    "喜欢和你们一起在 /game/ 里冒险！",
+    "以前经常和朋友一起玩 /gamemode/，现在他们都不在线了，真怀念那段日子。",
+    "好久没见老朋友上线了，大家都不玩这个游戏了吗？",
+    "/player/，你还记得以前和我们一起玩的那些人吗？",
+    "有时候真想回到大家一起在 /map/ 上玩的日子。",
+    "好像越来越少人玩了，以前服务器经常爆满，现在却很安静。",
+    "以前我们一群人在 /game/ 里胡闹，现在只剩我一个。",
     "/workshop/ 这个模组的作者很久没有更新了，他的模组很有趣。",
     "有人想和我一起测试 /workshop/ 这个模组吗？",
-    "我在玩 /workshop/ 这个模组的时候遇到了一个bug。",
+    "我在玩 /workshop/ 这个模组的时候遇到了一个bug，准备反馈给作者。",
     },
     ["en"] = {
     "/map/ is a great battlefield!",
@@ -289,6 +311,8 @@ local idles = {
     "This game looks terrible, the golden age of Gmod is over.",
     "180.100.47.6 Is that your IP address? I'm a hacker!",
     "I'm 76 years old, but I still start Gmod every day.",
+    "Do you think Gman really exists?",
+    "I'm a new player. I heard there are 'SkibidiToilet' characters in this game. Which do you think is the strongest?",
     "Look who's here, /player/?",
     "/player/? What brought you here?",
     "/player/, do you know how to get experience? I'm new here.",
@@ -325,9 +349,29 @@ local idles = {
     "I don't think I deserve the title of /rank/.",
     "/player/ said someone saw a mysterious black NPC in /map/.",
     "I'm in pain, /player/.",
+    "I searched all over /map/, turns out /player/ was AFK in a corner.",
+    "Is /player/ the server admin?",
+    "Where do you all think is the best hiding spot on /map/?",
+    "/player/, want to go explore the secret passages in /map/ together?",
+    "I'm friends with /player/ in real life, we came to play together.",
+    "The original soundtrack of /game/ is really great.",
+    "/player/ almost crashed the server just now!",
+    "I didn't expect there would be a secret room in /map/.",
+    "/player/ destroyed me in /game/ last time, now it's time for revenge!",
+    "I'm super sleepy now, it's already /time/ and I'm still not offline.",
+    "Everyone is gathering in the center of /map/, is there going to be a party?",
+    "I'm planning to record a /gamemode/ video for Youtube.",
+    "Who discovered the easter egg in /map/ first?",
+    "I love adventuring with you all in /game/!",
+    "I used to play /gamemode/ with friends all the time, now they're never online, I really miss those days.",
+    "It's been a long time since I've seen old friends come online. Has everyone stopped playing this game?",
+    "/player/, do you remember those people who used to play with us?",
+    "Sometimes I just want to go back to the days when everyone played together on /map/.",
+    "Seems like fewer and fewer people are playing, the server used to be full, now it's so quiet.",
+    "We used to mess around in /game/ as a group, now I'm the only one left.",
     "The creator of /workshop/ hasn't updated in a long time, their mod was fun.",
     "Does anyone want to test the /workshop/ mod with me?",
-    "I encountered a bug while playing the /workshop/ mod.",
+    "I encountered a bug while playing the /workshop/ mod, I'll report it to the author.",
     }
 }
 
@@ -545,14 +589,31 @@ if SERVER then
         
         -- 获取已安装的创意工坊物品
         local addons = engine.GetAddons()
+        local installedAddons = 0
         if addons then
             for _, addon in ipairs(addons) do
                 if addon and addon.mounted and addon.title then
                     table.insert(workshopItems, addon.title)
+                    installedAddons = installedAddons + 1
                 end
             end
         end
-        
+        -- 如果插件数少于3个,添加预设的插件列表
+        if installedAddons < 3 then
+            workshopItems = {
+                "Wiremod",
+                "Tactical Commander Mode",
+                "gPeek - Addon Content Inspector",
+                "ttt_scarisland_2026",
+                "Barney's Beer Bar",
+                "Star Wars Vehicles",
+                "HOPIUM",
+                "Source Shadows",
+                "Ultimate RT Cameras",
+                "gm_bigcity"
+            }
+        end
+
         -- 获取已安装的游戏模式
         local gamemodes = engine.GetGamemodes()
         local installedGamemodes = 0
